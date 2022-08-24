@@ -38,7 +38,7 @@ describe("4: Add Liquidity to Uniswap V3", function ()
     const dai_whale = await ethers.getSigner(DAI_WHALE);
     const usdc_whale = await ethers.getSigner(USDC_WHALE);
 
-    const LiquidityV3 = await ethers.getContractFactory("LiquidityExamples");
+    const LiquidityV3 = await ethers.getContractFactory("LetsSwap");
 
     liquidityV3 = await LiquidityV3.deploy();
     await liquidityV3.deployed();
@@ -71,28 +71,13 @@ describe("4: Add Liquidity to Uniswap V3", function ()
 console.log('START')
     return { usdc, dai, accounts, liquidityV3 }
   }
-  describe("Supply USDC <-> DAI", () =>
+  describe("Swap", () =>
   {
-    it("mintNewPosition", async () =>
+    it("swap", async () =>
     {
-      const { usdc, dai, accounts, liquidityV3 } = await loadFixture(deployFixture)
 
-      const dai_amount = 100n * 10n ** 18n;
-      const usdc_amount = 100n * 10n ** 6n;
 
-      await dai.connect(accounts[0]).transfer(liquidityV3.address, dai_amount);
-      await usdc.connect(accounts[0]).transfer(liquidityV3.address, usdc_amount);
-
-      await liquidityV3.mintNewPosition();
-
-      console.log(
-        "DAI balance after add liquidity",
-        ethers.utils.formatEther(await dai.balanceOf(accounts[0].address))
-      );
-      console.log(
-        "USDC balance after add liquidity",
-        ethers.utils.formatUnits(await usdc.balanceOf(accounts[0].address), 6)
-      );
+    
     });
   })
 

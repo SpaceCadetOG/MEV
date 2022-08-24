@@ -21,7 +21,6 @@ interface AggregatorInterface {
 contract Aggregator {
     address public WETH;
     address public USDC;
-    address public USDT;
     address public DAI;
     AggregatorInterface[2] public routers;
 
@@ -118,7 +117,7 @@ contract Aggregator {
 
     function weth2dai(uint256 amount) public {
         IERC20 weth = IERC20(WETH);
-        // weth.transferFrom(msg.sender, address(this), amount); 
+        // weth.transferFrom(msg.sender, address(this), amount);
 
         address[] memory path = new address[](2);
         path[0] = WETH;
@@ -141,7 +140,7 @@ contract Aggregator {
 
     function weth2usdc(uint256 amount) public {
         IERC20 weth = IERC20(WETH);
-        // weth.transferFrom(msg.sender, address(this), amount); 
+        // weth.transferFrom(msg.sender, address(this), amount);
         address[] memory path = new address[](2);
         path[0] = WETH;
         path[1] = USDC;
