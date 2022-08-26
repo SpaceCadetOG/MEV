@@ -1,13 +1,16 @@
-# Sample Hardhat Project
+# Defi Index Fund
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+This project is still in development. For a lot of defi users they want to invest in assets but some dont want to take on much risk. Similar to a regular index fund, This contract will aqquire the top 5 blue chip defi assets to hold.
+
+- This is deployed on arbitrum but can be applied to any chain w/ any tokens of chose
 
 Try running some of the following tasks:
 
-```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
+1. install dependencies => npm install
+2. run test => npx hardhat test
+
+
+
+
+*Bug in defi simulation*
+*The UI is still in development*

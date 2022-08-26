@@ -53,23 +53,33 @@ describe("Index Funds", function () {
       const { fund, owner, weth } = await loadFixture(IndexFundFixture);
       await fund.getPriceOfAllCoins();
       const uniPrice = await fund.uniPrice();
-      console.log(`uniswap token price => ${uniPrice}`);
+      console.log(
+        `uniswap token price => ${ethers.utils.formatUnits(uniPrice, 8)}`
+      );
       expect(uniPrice).to.greaterThan(0);
 
       const aavePrice = await fund.aavePrice();
-      console.log(`aave token price => ${aavePrice}`);
+      console.log(
+        `aave token price => ${ethers.utils.formatUnits(aavePrice, 8)}`
+      );
       expect(aavePrice).to.greaterThan(0);
 
       const makerPrice = await fund.makerPrice();
-      console.log(`maker token price => ${makerPrice}`);
+      console.log(
+        `maker token price => ${ethers.utils.formatUnits(makerPrice, 8)}`
+      );
       expect(makerPrice).to.greaterThan(0);
 
       const crvPrice = await fund.crvPrice();
-      console.log(`crv token price => ${crvPrice}`);
+      console.log(
+        `crv token price => ${ethers.utils.formatUnits(crvPrice, 8)}`
+      );
       expect(crvPrice).to.greaterThan(0);
 
       const compPrice = await fund.compPrice();
-      console.log(`comp token price => ${compPrice}`);
+      console.log(
+        `comp token price => ${ethers.utils.formatUnits(compPrice, 8)}`
+      );
       expect(compPrice).to.greaterThan(0);
     });
 
@@ -81,15 +91,21 @@ describe("Index Funds", function () {
       let beforeBal = await fund.balanceOf(user.address);
       let beforeBalEther = await provider.getBalance(user.address);
       console.log(`Before IndexToken Balance => ${beforeBal}`);
-      console.log(`Before Balance ETH => ${ethers.utils.formatEther(beforeBalEther)}`);
+      console.log(
+        `Before Balance ETH => ${ethers.utils.formatEther(beforeBalEther)}`
+      );
 
-      await fund.connect(user).buyToken(3, { value: ethers.utils.parseEther('10') });
+      await fund
+        .connect(user)
+        .buyToken(3, { value: ethers.utils.parseEther("10") });
 
       let afterBal = await fund.balanceOf(user.address);
       let afterBalEther = await provider.getBalance(user.address);
       expect(afterBal).to.equal("3");
       console.log(`After IndexToken Balance => ${afterBal}`);
-      console.log(`After Balance ETH => ${ethers.utils.formatEther(afterBalEther)}`);
+      console.log(
+        `After Balance ETH => ${ethers.utils.formatEther(afterBalEther)}`
+      );
     });
 
     it("Should simulate defi increase...redeem tokens for profit", async function () {
@@ -105,26 +121,35 @@ describe("Index Funds", function () {
       let beforeBal = await fund.balanceOf(user.address);
       let beforeBalEther = await provider.getBalance(user.address);
       console.log(`Before IndexToken Balance => ${beforeBal}`);
-      console.log(`Before Balance ETH => ${ethers.utils.formatEther(beforeBalEther)}`);
+      console.log(
+        `Before Balance ETH => ${ethers.utils.formatEther(beforeBalEther)}`
+      );
 
-      await fund.connect(user).buyToken(3, { value: ethers.utils.parseEther('10') });
+      await fund
+        .connect(user)
+        .buyToken(3, { value: ethers.utils.parseEther("10") });
 
       let afterBal = await fund.balanceOf(user.address);
       let afterBalEther = await provider.getBalance(user.address);
       expect(afterBal).to.equal("3");
+
       console.log(`After IndexToken Balance => ${afterBal}`);
-      console.log(`After Balance ETH => ${ethers.utils.formatEther(afterBalEther)}`);
+      console.log(
+        `After Balance ETH => ${ethers.utils.formatEther(afterBalEther)}`
+      );
 
-      await fund.defiIncreased();
-
+      await fund.defiSimulate();
       await fund.connect(user).redeemToken();
+
       let afterReedemBal = await fund.balanceOf(user.address);
       let afterReedemBalEther = await provider.getBalance(user.address);
 
       console.log(`After redeem IndexToken Balance => ${afterReedemBal}`);
-      console.log(`After redeem Balance ETH => ${ethers.utils.formatEther(afterReedemBalEther)}`);
-
+      console.log(
+        `After redeem Balance ETH => ${ethers.utils.formatEther(
+          afterReedemBalEther
+        )}`
+      );
     });
-
   });
 });

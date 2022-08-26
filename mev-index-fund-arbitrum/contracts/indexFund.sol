@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: BicBlockchainSolutions
 pragma solidity 0.8.9;
 
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
@@ -16,6 +16,7 @@ contract IndexFund {
         AggregatorV3Interface(0xaebDA2c976cfd1eE1977Eac079B4382acb849325);
     AggregatorV3Interface public aavePriceAgg =
         AggregatorV3Interface(0xaD1d5344AaDE45F43E596773Bcc4c423EAbdD034);
+        
     int256 public uniPrice;
     int256 public makerPrice;
     int256 public compPrice;
@@ -28,7 +29,7 @@ contract IndexFund {
         calculatePricePerToken();
     }
 
-    function balanceOf(address user) public view returns (uint256) {
+    function balanceOf(address user) external view returns (uint256) {
         return balances[user];
     }
 
@@ -73,8 +74,8 @@ contract IndexFund {
         balances[msg.sender] += amount;
     }
 
-    // simulate
-    function defiIncreased() public {
+    // simulate price going up in token or defi
+    function defiSimulate() public {
         pricePerToken = pricePerToken * 2;
     }
 
