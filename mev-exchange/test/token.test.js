@@ -99,7 +99,9 @@ describe("Token", () => {
   });
   describe("Approve", () => {
     it("approve(exchange, amount)", async function () {
-      const { token, owner, exchange, tokens } = await loadFixture(deployFixture);
+      const { token, owner, exchange, tokens } = await loadFixture(
+        deployFixture
+      );
       let amount = tokens(100);
 
       let tx = token.connect(owner).approve(exchange.address, amount);
@@ -108,14 +110,22 @@ describe("Token", () => {
         .emit(token, "Approval")
         .withArgs(owner.address, exchange.address, amount);
 
-      expect(await token.allowance(owner.address, exchange.address)).equal(amount);
+      expect(await token.allowance(owner.address, exchange.address)).equal(
+        amount
+      );
     });
 
     it("approve(0x0000, amount) to fail", async function () {
-      const { token, owner, exchange, tokens } = await loadFixture(deployFixture);
+      const { token, owner, exchange, tokens } = await loadFixture(
+        deployFixture
+      );
       let amount = tokens(100);
 
-      await expect (token.connect(owner).approve("0x0000000000000000000000000000000000000000", amount)).to.reverted;
+      await expect(
+        token
+          .connect(owner)
+          .approve("0x0000000000000000000000000000000000000000", amount)
+      ).to.reverted;
     });
   });
   describe("TransferFrom", () => {
