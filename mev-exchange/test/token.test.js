@@ -1,3 +1,4 @@
+/* eslint-disable jest/valid-expect */
 const {
   time,
   loadFixture,
@@ -8,7 +9,7 @@ const { ethers } = require("hardhat");
 
 describe("Token", () => {
   async function deployFixture() {
-    const [owner, otherAccount] = await ethers.getSigners();
+    const [owner, user, exchange] = await ethers.getSigners();
     // reusable
     const tokens = (n) => {
       return ethers.utils.parseUnits(n.toString(), "ether");
@@ -18,54 +19,111 @@ describe("Token", () => {
     const Token = await ethers.getContractFactory("Token");
     const token = await Token.deploy("MEV TOKEN", "MEV", 18, 1000000);
 
-    return { token, value, owner };
+    return { token, value, owner, user, exchange, tokens };
   }
 
-  it("name()", async function () {
-    const { token } = await loadFixture(deployFixture);
+  describe("Token Details", () => {
+    it("name()", async function () {
+      const { token } = await loadFixture(deployFixture);
 
-    expect(await token.name()).equal("MEV TOKEN");
-  });
-  it("totalSupply()", async function () {
-    const { token, value } = await loadFixture(deployFixture);
+      expect(await token.name()).equal("MEV TOKEN");
+    });
+    it("totalSupply()", async function () {
+      const { token, value } = await loadFixture(deployFixture);
 
-    expect(await token.totalSupply()).equal(value); // wei
+      expect(await token.totalSupply()).equal(value); // wei
+    });
+    it("symbol()", async function () {
+      const { token } = await loadFixture(deployFixture);
+      expect(await token.symbol()).equal("MEV");
+    });
+    it("decimals()", async function () {
+      const { token } = await loadFixture(deployFixture);
+      expect(await token.decimals()).equal("18");
+    });
   });
-  it("symbol()", async function () {
-    const { token } = await loadFixture(deployFixture);
-    expect(await token.symbol()).equal("MEV");
-  });
-  it("decimals()", async function () {
-    const { token } = await loadFixture(deployFixture);
-    expect(await token.decimals()).equal("18");
-  });
+  describe("Balance", () => {
     it("balanceOf(contract) = TS", async function () {
-    const { token } = await loadFixture(deployFixture);
+      const { token, owner } = await loadFixture(deployFixture);
 
-    expect(await token.balanceOf(token.address)).equal(
-      await token.totalSupply()
-    );
-  });
-  it("balanceOf(contract) = balance(contract)", async function () {
-    const { token } = await loadFixture(deployFixture);
+      expect(await token.balanceOf(owner.address)).equal(
+        await token.totalSupply()
+      );
+    });
+    it("balanceOf(owner) = balance(owner)", async function () {
+      const { token, owner } = await loadFixture(deployFixture);
 
-    expect(await token.balanceOf(token.address)).equal(
-      await token.balance(token.address)
-    );
-  });
-  it("balanceOf(owner) = 0", async function () {
-    const { token, owner } = await loadFixture(deployFixture);
+      expect(await token.balanceOf(owner.address)).equal(
+        await token.balance(owner.address)
+      );
+    });
+    it("balanceOf(contract) = 0", async function () {
+      const { token, owner } = await loadFixture(deployFixture);
 
-    expect(await token.balanceOf(owner.address)).equal(0);
-    expect(await token.balance(owner.address)).equal(0);
+      expect(await token.balanceOf(token.address)).equal(0);
+      expect(await token.balance(token.address)).equal(0);
+    });
   });
-  it.skip("Should get ..-", async function () {
-    const { token } = await loadFixture(deployFixture);
+  describe("Transfer", () => {
+    it("transfer(owner => user)", async function () {
+      const { token, owner, user, tokens } = await loadFixture(deployFixture);
+      let amount = tokens(100);
+      let before = await token.balanceOf(user.address);
+      let tx = await token.connect(owner).transfer(user.address, amount);
+      let result = await tx.wait();
+      let after = await token.balanceOf(user.address);
+      expect(after).greaterThan(before);
+      expect(after).greaterThan(amount);
+      await expect(tx)
+        .emit(token, "Transfer")
+        .withArgs(owner.address, user.address, amount);
+      console.log(result);
+    });
+    it("transfer(user => owner) to fail with insufficent funds", async function () {
+      const { token, owner, user, tokens } = await loadFixture(deployFixture);
+      let amount = tokens(1000000000);
+
+      await expect(
+        token.connect(owner).transfer(user.address, amount)
+      ).revertedWith("insufficent funds");
+    });
+    it("transfer(user => 0x0000...) to fail", async function () {
+      const { token, owner, user, tokens } = await loadFixture(deployFixture);
+      let amount = tokens(100);
+      await expect(
+        token
+          .connect(owner)
+          .transfer("0x0000000000000000000000000000000000000000", amount)
+      ).reverted;
+    });
   });
-  it.skip("Should get .", async function () {
-    const { token } = await loadFixture(deployFixture);
+  describe("Approve", () => {
+    it("approve(exchange, amount)", async function () {
+      const { token, owner, exchange, tokens } = await loadFixture(deployFixture);
+      let amount = tokens(100);
+
+      let tx = token.connect(owner).approve(exchange.address, amount);
+
+      await expect(tx)
+        .emit(token, "Approval")
+        .withArgs(owner.address, exchange.address, amount);
+
+      expect(await token.allowance(owner.address, exchange.address)).equal(amount);
+    });
+
+    it("approve(0x0000, amount) to fail", async function () {
+      const { token, owner, exchange, tokens } = await loadFixture(deployFixture);
+      let amount = tokens(100);
+
+      await expect (token.connect(owner).approve("0x0000000000000000000000000000000000000000", amount)).to.reverted;
+    });
   });
-  it.skip("Should get ....", async function () {
-    const { token } = await loadFixture(deployFixture);
+  describe("TransferFrom", () => {
+    it.skip("Should get ..", async function () {
+      const { token } = await loadFixture(deployFixture);
+    });
+    it.skip("Should get ...", async function () {
+      const { token } = await loadFixture(deployFixture);
+    });
   });
 });
