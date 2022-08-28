@@ -11,3 +11,13 @@ GAS_REPORT=true npx hardhat test
 npx hardhat node
 npx hardhat run scripts/deploy.js
 ```
+
+
+*node*
+npx hardhat node --fork https://RPC_HERE
+
+*deploy*
+npx hardhat run --network local test test/token.test.js
+
+*test*
+npx hardhat test --network local test/token.test.js 

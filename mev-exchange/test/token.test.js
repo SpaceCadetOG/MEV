@@ -7,18 +7,48 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 describe("Token", () => {
-  async function deployOneYearLockFixture() {
+  async function deployFixture() {
     const [owner, otherAccount] = await ethers.getSigners();
+    // reusable
+    const tokens = (n) => {
+      return ethers.utils.parseUnits(n.toString(), "ether");
+    };
 
+    const value = tokens("1000000");
     const Token = await ethers.getContractFactory("Token");
-    const token = await Token.deploy("MEV");
+    const token = await Token.deploy("MEV TOKEN", "MEV", 18, 1000000);
 
-    return { token };
+    return { token, value };
   }
 
-  it("Should get Token Name", async function () {
-    const { token } = await loadFixture(deployOneYearLockFixture);
+  it("name()", async function () {
+    const { token } = await loadFixture(deployFixture);
 
-    expect(await token.name()).to.equal("MEV");
+    expect(await token.name()).equal("MEV TOKEN");
+  });
+  it("totalSupply()", async function () {
+    const { token, value } = await loadFixture(deployFixture);
+
+    expect(await token.totalSupply()).equal(value); // wei
+  });
+  it("symbol()", async function () {
+    const { token } = await loadFixture(deployFixture);
+    expect(await token.symbol()).equal("MEV");
+  });
+  it("decimals()", async function () {
+    const { token } = await loadFixture(deployFixture);
+    expect(await token.decimals()).equal("18");
+  });
+  it.skip("Should get ..--", async function () {
+    const { token } = await loadFixture(deployFixture);
+  });
+  it.skip("Should get ..-", async function () {
+    const { token } = await loadFixture(deployFixture);
+  });
+  it.skip("Should get .", async function () {
+    const { token } = await loadFixture(deployFixture);
+  });
+  it.skip("Should get ....", async function () {
+    const { token } = await loadFixture(deployFixture);
   });
 });
