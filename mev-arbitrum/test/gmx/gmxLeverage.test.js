@@ -1,4 +1,5 @@
 const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
+const { expect } = require("chai");
 const { ethers, network, BigNumber } = require("hardhat");
 const BN = require("bn.js");
 const addresses = require("../../utils/addresses");
@@ -79,50 +80,6 @@ describe("Using GMX", function () {
       console.log(`GMX Prices of ETH: ${eth_price}`);
     });
 
-    it("Token Amount To USD On GMX", async function () {
-      const { gmx, usdc } = await loadFixture(deployFixture);
-      amountIn = 1n * 10n ** 8n;
-      amountInEth = 1n * 10n ** 18n;
-      const avax_price = ethers.utils.formatUnits(
-        await gmx.TokenAmountToUSDMinOnGMX(
-          "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
-          amountIn
-        ),
-        18
-      );
-      const eth_price = ethers.utils.formatUnits(
-        await gmx.TokenAmountToUSDMinOnGMX(
-          "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
-          amountInEth
-        ),
-        18
-      );
-      console.log(`1 WBTC to USD: $${avax_price}`);
-      console.log(`1 ETH to USD: $${eth_price}`);
-    });
-
-    it("MAX AMOUNT OUT for USDC USD On GMX", async function () {
-      const { gmx, usdc } = await loadFixture(deployFixture);
-      amountIn = 1n * 10n ** 8n;
-      amountInEth = 1n * 10n ** 18n;
-      const avax_price = await gmx.getAmountsOutOnGMX(
-        "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
-        "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
-        amountIn
-      );
-      const eth_price = await gmx.getAmountsOutOnGMX(
-        "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
-        "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
-        amountInEth
-      );
-      console.log(
-        `1 WBTC to USDC: $${avax_price[0] / 100} || ${avax_price[1] / 100}`
-      );
-      console.log(
-        `1 ETH to USDC: $${eth_price[0] / 100} || ${eth_price[1] / 100}`
-      );
-    });
-
     it("get Pool Amount to take Postion GMX", async function () {
       const { gmx, usdc } = await loadFixture(deployFixture);
       amountIn = 1n * 10n ** 18n;
@@ -141,22 +98,7 @@ describe("Using GMX", function () {
       );
     });
 
-    it("Swap WETH -> USDC On GMX", async function () {
-      const { gmx, usdc, weth, user, testChainlink } = await loadFixture(
-        deployFixture
-      );
-      amountIn = 1n * 10n ** 18n;
-      // await usdc.connect(user).transfer(gmx.address, amountIn);
-      price = await testChainlink.getLatestPriceETH();
-      await gmx.swapOnGMX(weth.address, usdc.address, amountIn);
-
-      console.log(
-        "B: USDC Balance of User",
-        ethers.utils.formatUnits(await usdc.balanceOf(user.address), 6)
-      );
-      console.log(price);
-    });
-    it.only("Increase Postion on GMX", async function () {
+    it("Open Postion on GMX", async function () {
       const { gmx, usdc, weth, testChainlink, ethAmount, user } =
         await loadFixture(deployFixture);
       amountIn = 1n * 10n ** 18n;
@@ -169,18 +111,9 @@ describe("Using GMX", function () {
       fee = await gmx.fee();
 
 
-      ethbalance = await gmx.balance();
-      console.log(ethbalance);
-      console.log(await gmx.fee());
-      let obj = {
-        sizeDelta: delta,
-        isLong: true,
-        price: maxLong,
-        amount: amountIn,
-        fee: { value: 2 *( await gmx.fee()) }
-      };
-      await gmx.deposit(obj.fee)
-      await gmx.OpenLeveragePositionOnGMXPool( obj.amount, obj.sizeDelta, obj.price, obj.fee );
+      expect(await gmx.fee()).equal(100000000000000);
+      
+      gmx.OpenPositionGMX(WETH, usdc.address, amountIn)
 
     });
 

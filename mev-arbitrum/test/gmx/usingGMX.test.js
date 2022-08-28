@@ -100,7 +100,7 @@ describe("Using GMX", function () {
       console.log(`1 ETH to USD: $${eth_price}`);
     });
 
-    it.only("MAX AMOUNT OUT for USDC USD On GMX", async function () {
+    it("MAX AMOUNT OUT for USDC USD On GMX", async function () {
       const { gmx, usdc } = await loadFixture(deployFixture);
       amountIn = 1n * 10n ** 8n;
       amountInEth = 1n * 10n ** 18n;
@@ -115,7 +115,9 @@ describe("Using GMX", function () {
         amountInEth
       );
       console.log(
-        `1 WBTC to USDC: $${avax_price[0] / 1000000} || ${avax_price[1] / 1000000}`
+        `1 WBTC to USDC: $${avax_price[0] / 1000000} || ${
+          avax_price[1] / 1000000
+        }`
       );
       console.log(
         `1 ETH to USDC: $${eth_price[0] / 1000000} || ${eth_price[1] / 1000000}`
@@ -161,29 +163,6 @@ describe("Using GMX", function () {
     });
 
     it("Add Liquidity on GMX", async function () {
-      const { gmx, usdc } = await loadFixture(deployFixture);
-    });
-
-    it("Open Postion on GMX", async function () {
-      const { gmx, usdc } = await loadFixture(deployFixture);
-    });
-
-    it.only("Increase Postion on GMX", async function () {
-      const { gmx, usdc, weth, testChainlink } = await loadFixture(deployFixture);
-      amountIn = 1n * 10n ** 18n;
-      delta = 10n * 10n ** 30n
-
-      maxLong = 2000n * 10n ** 30n
-      
-      price = await testChainlink.getLatestPriceETH();
-      await gmx.OpenLeveragePositionOnGMXPool(weth.address, amountIn, delta, true, maxLong)
-    });
-
-    it("Decrease Postion on GMX", async function () {
-      const { gmx, usdc } = await loadFixture(deployFixture);
-    });
-
-    it("Close Postion on GMX", async function () {
       const { gmx, usdc } = await loadFixture(deployFixture);
     });
   });

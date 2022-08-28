@@ -55,54 +55,55 @@ contract leverageGMX {
         // https://gmxio.gitbook.io/gmx/contracts#positions-list
     }
 
-    function deposit() external payable {
-        require(msg.value == 200000000000000, 'no');
-    }
-    function OpenLeveragePositionOnGMXPool(
-        uint256 amount,
-        uint256 sizeDelta,
-        uint256 price
-    ) external payable {
-        // IERC20(asset).transferFrom(msg.sender, address(this), amount);
-        IERC20(WETH).approve(
-            0xaBBc5F99639c9B6bCb58544ddf04EFA6802F4064,
-            sizeDelta
-        );
-
-        address[] memory path;
-        path = new address[](1);
-        path[0] = WETH;
-        position_router.createIncreasePosition(path, WETH, amount, 0, sizeDelta, true, price, msg.value, 0);
-        console.log("IncreasePosition on GMX");
-    }
-
     //
     function fee() public view returns (uint256) {
         return position_router.minExecutionFee();
     }
 
-    function balance() public view returns (uint256) {
-        return address(this).balance;
-    }
-
     receive() external payable {}
-    /**
+
     // open position => Flash Loan to long or short asset pay back earned funds
-        // approve router to amount to deposit 
-        // PositionManager.increasePosition() = partner contracts
-        // PositionRouter.createIncreasePosition() = can be used by any contract and will request the position to be opened, a keeper will then execute this request
-        // PositionRouter.createIncreasePosition() = has the same input parameters but additionally has an executionFee value that can be set to PositionRouter.minExecutionFee
-    
+    // approve router to amount to deposit
+    // PositionManager.increasePosition() = partner contracts
+    // PositionRouter.createIncreasePosition() = can be used by any contract and will request the position to be opened, a keeper will then execute this request
+    // PositionRouter.createIncreasePosition() = has the same input parameters but additionally has an executionFee value that can be set to PositionRouter.minExecutionFee
 
     // PositionManager.increasePosition(path, indexToke, amountIn, minOut, sizeDelta, isLong, price)
-    
 
+    function OpenPositionGMX(
+        address _tokenIn,
+        address _tokenOut,
+        uint256 _amount,
+        uint256 minOut,
+        uint256 _sizeDelta,
+        bool _isLong,
+        uint256 _acceptablePrice,
+        uint256 _executionFee
+    ) external payable {
+        IERC20(_tokenIn).transferFrom(msg.sender, address(this), _amount);
+        IERC20(_tokenIn).approve(
+            0xaBBc5F99639c9B6bCb58544ddf04EFA6802F4064,
+            _amount
+        );
 
+        address[] memory path;
+        path = new address[](2);
+        path[0] = _tokenIn;
+        path[1] = _tokenOut;
 
-
-
-
-
+        position_router.createIncreasePosition(
+            path,
+            _tokenOut,
+            _amount,
+            minOut,
+            _sizeDelta,
+            _isLong,
+            _acceptablePrice,
+            _executionFee,
+            0
+        );
+    }
+    /**
     // * Long  => earn profit if tokwn price goes up
     // * Short => earn profit if tokwn price goes down
     // * track for manage => entryPrice, exitPrice, liquidationPrice *

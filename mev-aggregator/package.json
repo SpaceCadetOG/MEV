@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@aave/core-v3": "^1.13.1",
+    "@aave/periphery-v3": "^1.10.0",
     "@openzeppelin/contracts": "^4.7.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.3.0",

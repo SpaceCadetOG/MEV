@@ -13,9 +13,9 @@ interface IUniswapRouter is ISwapRouter {
 
 contract LetsSwap {
     // refund Eth
-    address public WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-    address public USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
-    address public DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
+    address public WETH = 0x82aF49447D8a07e3bd95BD0d56f35241523fBab1;
+    address public USDC = 0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8;
+    address public DAI = 0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1;
 
     IUniswapRouter public swapV3;
     IQuoter public quoter;

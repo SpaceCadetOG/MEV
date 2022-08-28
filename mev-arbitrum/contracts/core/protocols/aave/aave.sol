@@ -53,12 +53,11 @@ contract AaveLendingV3 {
         DataTypes.ReserveData memory data = IPool(pool).getReserveData(asset);
         return (data);
     }
+
     // getReservesList
     function AaveReserveList() external view returns (address[] memory) {
         return IPool(pool).getReservesList();
     }
-
-
 
     // getUserAccountData ... break this down w/ {currentLiquidationThreshold, ltv, healthFactor}
     function UserAccountData(address user)
