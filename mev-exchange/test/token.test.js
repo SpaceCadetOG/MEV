@@ -18,7 +18,7 @@ describe("Token", () => {
     const Token = await ethers.getContractFactory("Token");
     const token = await Token.deploy("MEV TOKEN", "MEV", 18, 1000000);
 
-    return { token, value };
+    return { token, value, owner };
   }
 
   it("name()", async function () {
@@ -39,8 +39,25 @@ describe("Token", () => {
     const { token } = await loadFixture(deployFixture);
     expect(await token.decimals()).equal("18");
   });
-  it.skip("Should get ..--", async function () {
+    it("balanceOf(contract) = TS", async function () {
     const { token } = await loadFixture(deployFixture);
+
+    expect(await token.balanceOf(token.address)).equal(
+      await token.totalSupply()
+    );
+  });
+  it("balanceOf(contract) = balance(contract)", async function () {
+    const { token } = await loadFixture(deployFixture);
+
+    expect(await token.balanceOf(token.address)).equal(
+      await token.balance(token.address)
+    );
+  });
+  it("balanceOf(owner) = 0", async function () {
+    const { token, owner } = await loadFixture(deployFixture);
+
+    expect(await token.balanceOf(owner.address)).equal(0);
+    expect(await token.balance(owner.address)).equal(0);
   });
   it.skip("Should get ..-", async function () {
     const { token } = await loadFixture(deployFixture);
