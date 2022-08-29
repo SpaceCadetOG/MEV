@@ -10,7 +10,6 @@ async function main() {
 
   console.log(`Token deployed to ${token.address}`);
   console.log(`-----------------------------------`);
-  console.log(`Token NAME: ${await token.getName()}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

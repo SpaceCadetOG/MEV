@@ -73,11 +73,11 @@ describe("Token", () => {
       let result = await tx.wait();
       let after = await token.balanceOf(user.address);
       expect(after).greaterThan(before);
-      expect(after).greaterThan(amount);
+      expect(after).eq(amount);
       await expect(tx)
         .emit(token, "Transfer")
         .withArgs(owner.address, user.address, amount);
-      console.log(result);
+      // console.log(result);
     });
     it("transfer(user => owner) to fail with insufficent funds", async function () {
       const { token, owner, user, tokens } = await loadFixture(deployFixture);
@@ -129,11 +129,82 @@ describe("Token", () => {
     });
   });
   describe("TransferFrom", () => {
-    it.skip("Should get ..", async function () {
-      const { token } = await loadFixture(deployFixture);
+    it("transferFrom(owner, exchange, amount)", async function () {
+      const { token, owner, exchange, tokens } = await loadFixture(
+        deployFixture
+      );
+      let amount = tokens(100);
+      await token.connect(owner).approve(exchange.address, amount);
+      expect(await token.allowance(owner.address, exchange.address)).equal(
+        amount
+      );
+      let before = await token.balanceOf(exchange.address);
+      let tx = await token
+        .connect(owner)
+        .transferFrom(owner.address, exchange.address, amount);
+      let result = await tx.wait();
+      let after = await token.balanceOf(exchange.address);
+      expect(after).greaterThan(before);
+      expect(after).eq(amount);
+      await expect(tx)
+        .emit(token, "Transfer")
+        .withArgs(owner.address, exchange.address, amount);
+      // allowance to equal 0 after tranfer
+      expect(await token.allowance(owner.address, exchange.address)).equal(0);
+
+      console.log(result);
     });
-    it.skip("Should get ...", async function () {
-      const { token } = await loadFixture(deployFixture);
+    it("Should revert not approved.", async function () {
+      const { token, owner, exchange, tokens } = await loadFixture(
+        deployFixture
+      );
+      let amount = tokens(100);
+      await expect(
+        token
+          .connect(owner)
+          .transferFrom(owner.address, exchange.address, amount)
+      ).to.revertedWith("not approve to spend");
+    });
+
+    it("transferFrom(user => 0x0000...) to fail", async function () {
+      const { token, owner, user, tokens } = await loadFixture(deployFixture);
+      let amount = tokens(100);
+      await expect(
+        token
+          .connect(owner)
+          .transferFrom(
+            owner.address,
+            "0x0000000000000000000000000000000000000000",
+            amount
+          )
+      ).reverted;
+    });
+
+    it("transferFrom(user => owner) to fail with insufficent funds", async function () {
+      const { token, owner, exchange, tokens } = await loadFixture(
+        deployFixture
+      );
+      let amount = tokens(1000000000);
+      await expect(
+        token
+          .connect(owner)
+          .transferFrom(owner.address, exchange.address, amount)
+      ).revertedWith("insufficent funds");
+    });
+  });
+
+  describe("Test", () => {
+    it(".....", async function () {
+      const { token, owner, exchange, tokens } = await loadFixture(
+        deployFixture
+      );
+      let amount = tokens(100);
+    });
+    it("......", async function () {
+      const { token, owner, exchange, tokens } = await loadFixture(
+        deployFixture
+      );
+      let amount = tokens(100);
     });
   });
 });

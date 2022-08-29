@@ -44,10 +44,7 @@ contract Token {
         returns (bool success)
     {
         require(balance[msg.sender] >= _amount, "insufficent funds");
-        require(_to != address(0));
-        balance[msg.sender] = balance[msg.sender] - _amount;
-        balance[_to] = balance[msg.sender] + _amount;
-        emit Transfer(msg.sender, _to, _amount);
+        _transfer(msg.sender, _to, _amount);
         return true;
     }
 
@@ -55,7 +52,13 @@ contract Token {
         address _from,
         address _to,
         uint256 _amount
-    ) public returns (bool success) {}
+    ) public returns (bool success) {
+        require(balance[_from] >= _amount, "insufficent funds");
+        require(allowance[_from][_to] >= _amount, "allowance to spend low");
+        allowance[_from][_to] = allowance[_from][_to] - _amount;
+        _transfer(_from, _to, _amount);
+        return true;
+    }
 
     function approve(address _spender, uint256 _amount)
         public
@@ -64,5 +67,16 @@ contract Token {
         require(_spender != address(0));
         allowance[msg.sender][_spender] = _amount;
         emit Approval(msg.sender, _spender, _amount);
+    }
+
+    function _transfer(
+        address _from,
+        address _to,
+        uint256 _amount
+    ) internal returns (bool success) {
+        require(_to != address(0));
+        balance[_from] = balance[_from] - _amount;
+        balance[_to] = balance[_to] + _amount;
+        emit Transfer(_from, _to, _amount);
     }
 }
