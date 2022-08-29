@@ -163,7 +163,7 @@ describe("Token", () => {
         token
           .connect(owner)
           .transferFrom(owner.address, exchange.address, amount)
-      ).to.revertedWith("not approve to spend");
+      ).to.revertedWith("allowance to spend low");
     });
 
     it("transferFrom(user => 0x0000...) to fail", async function () {

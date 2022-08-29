@@ -1,17 +1,15 @@
 # MEV Exchange
 
-- This will handle exchange of index tokens
-
-
-```
-
+- MEV Protection Exchange
 
 *node*
 npx hardhat node --fork https://RPC_HERE
 
+*test*
+npx hardhat test --network local 
+npx hardhat coverage
+
 *deploy*
 npx hardhat run --network local scripts/1_deploy.js
+npx hardhat run --network local scripts/2_interaction_exchange.js
 
-*test*
-npx hardhat test --network local test/token.test.js 
-npx hardhat test --network local test/exchange.test.js
