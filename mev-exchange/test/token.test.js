@@ -193,18 +193,4 @@ describe("Token", () => {
     });
   });
 
-  describe("Test", () => {
-    it(".....", async function () {
-      const { token, owner, exchange, tokens } = await loadFixture(
-        deployFixture
-      );
-      let amount = tokens(100);
-    });
-    it("......", async function () {
-      const { token, owner, exchange, tokens } = await loadFixture(
-        deployFixture
-      );
-      let amount = tokens(100);
-    });
-  });
 });
