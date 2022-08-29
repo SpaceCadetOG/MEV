@@ -14,3 +14,4 @@ npx hardhat run --network local test test/token.test.js
 
 *test*
 npx hardhat test --network local test/token.test.js 
+npx hardhat test --network local test/exchange.test.js

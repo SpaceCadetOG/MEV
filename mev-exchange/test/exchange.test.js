@@ -7,7 +7,7 @@ const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect, use } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("Exchange", () => {
+describe("MEV Exchange Contract", () => {
   async function deployFixture() {
     const [owner, feeCollector, user1, user2] = await ethers.getSigners();
     // reusable
@@ -29,10 +29,20 @@ describe("Exchange", () => {
 
     const exchange = await Exchange.deploy(feeCollector.address, fee);
     await token1.connect(owner).transfer(user1.address, tokens(100));
+    await dai.connect(owner).transfer(user2.address, tokens(100));
 
-    return { exchange, owner, tokens, token1, dai, feeCollector, fee, user1, user2 };
+    return {
+      exchange,
+      owner,
+      tokens,
+      token1,
+      dai,
+      feeCollector,
+      fee,
+      user1,
+      user2,
+    };
   }
-
   async function depositFixture() {
     const { owner, dai, exchange, tokens, feeCollector, token1, user1 } =
       await loadFixture(deployFixture);
@@ -42,7 +52,6 @@ describe("Exchange", () => {
 
     return { tx, token1, tokens, dai, exchange, amount, user1 };
   }
-
   async function withdrawFixture() {
     const { owner, exchange, tokens, feeCollector, token1, user1 } =
       await loadFixture(deployFixture);
@@ -53,7 +62,6 @@ describe("Exchange", () => {
     let tx1 = await exchange.connect(user1).withdraw(token1.address, amount);
     return { tx1, token1, exchange, amount, user1 };
   }
-
   async function tradeFixture() {
     const { owner, exchange, tokens, feeCollector, token1, user1, dai } =
       await loadFixture(deployFixture);
@@ -67,7 +75,6 @@ describe("Exchange", () => {
 
     return { tx3, dai, token1, exchange, amount, user1, tokens };
   }
-
   async function cancelTradeFixture() {
     const { owner, exchange, tokens, feeCollector, token1, user1, dai } =
       await loadFixture(deployFixture);
@@ -82,7 +89,34 @@ describe("Exchange", () => {
     let tx4 = await exchange.connect(user1).cancelTrade(1);
     return { tx4, dai, token1, exchange, amount, user1, tokens };
   }
+  async function brokerTradeFixture() {
+    const { owner, exchange, tokens, feeCollector, token1, user1, user2, dai } =
+      await loadFixture(deployFixture);
+    const amount = tokens("1");
+    await token1.connect(user1).approve(exchange.address, amount);
+    await exchange.connect(user1).deposit(token1.address, amount);
 
+    const amount2 = tokens("2");
+    await dai.connect(user2).approve(exchange.address, amount2);
+    await exchange.connect(user2).deposit(dai.address, amount2);
+
+    await exchange
+      .connect(user1)
+      .makeTrade(dai.address, tokens(1), token1.address, tokens(1));
+
+    let tx5 = await exchange.connect(user2).brokerTrade(1);
+    return {
+      tx5,
+      dai,
+      token1,
+      exchange,
+      amount,
+      user1,
+      user2,
+      tokens,
+      feeCollector,
+    };
+  }
   describe("Test Fees", () => {
     it("feeCollector", async function () {
       const { owner, exchange, tokens, feeCollector } = await loadFixture(
@@ -97,7 +131,6 @@ describe("Exchange", () => {
       expect(await exchange.feePercent()).equal(fee);
     });
   });
-
   describe("Deposit", () => {
     it("deposit tokens", async function () {
       const { tx, token1, exchange, amount, user1 } = await loadFixture(
@@ -128,7 +161,6 @@ describe("Exchange", () => {
       ).revertedWith("allowance to spend low");
     });
   });
-
   describe("Withdraw", () => {
     it("withdraw tokens", async function () {
       const { token1, exchange, amount, user1 } = await loadFixture(
@@ -161,7 +193,6 @@ describe("Exchange", () => {
         .reverted;
     });
   });
-
   describe("MakeTrade", () => {
     it("track Trade Count", async function () {
       const { owner, dai, exchange, tokens, feeCollector } = await loadFixture(
@@ -197,7 +228,7 @@ describe("Exchange", () => {
       ).revertedWith("must deposit more to make trade");
     });
   });
-  describe.only("CancelTrade", () => {
+  describe("CancelTrade", () => {
     it("updates cancels", async function () {
       const { exchange, fee } = await loadFixture(cancelTradeFixture);
       expect(await exchange.tradeCancelled(1)).equal(true);
@@ -231,12 +262,13 @@ describe("Exchange", () => {
         .connect(user1)
         .makeTrade(dai.address, tokens(1), token1.address, tokens(1));
 
-      await expect(exchange.connect(user1).cancelTrade(98679567)).revertedWith('invalid id');
+      await expect(exchange.connect(user1).cancelTrade(98679567)).revertedWith(
+        "invalid id"
+      );
     });
     it("Fail if not owner of trade id", async function () {
-      const { user1, dai, token1, exchange, fee, tokens, user2 } = await loadFixture(
-        deployFixture
-      );
+      const { user1, dai, token1, exchange, fee, tokens, user2 } =
+        await loadFixture(deployFixture);
       const amount = tokens("100");
       await token1.connect(user1).approve(exchange.address, amount);
       await exchange.connect(user1).deposit(token1.address, amount);
@@ -245,18 +277,135 @@ describe("Exchange", () => {
         .connect(user1)
         .makeTrade(dai.address, tokens(1), token1.address, tokens(1));
 
-      await expect(exchange.connect(user2).cancelTrade(1)).revertedWith('invalid owner');
-    });
-  });
-
-  describe.skip("BrokerTrade", () => {
-    it(".", async function () {
-      const { owner, exchange, tokens, feeCollector } = await loadFixture(
-        deployFixture
+      await expect(exchange.connect(user2).cancelTrade(1)).revertedWith(
+        "invalid owner"
       );
     });
-    it("..", async function () {
-      const { exchange, fee } = await loadFixture(deployFixture);
+  });
+  describe("BrokerTrade", () => {
+    it("Trade and Charge fee", async function () {
+      const {
+        owner,
+        user1,
+        user2,
+        exchange,
+        tokens,
+        feeCollector,
+        token1,
+        dai,
+      } = await loadFixture(brokerTradeFixture);
+      expect(await exchange.user_balance(token1.address, user1.address)).equal(
+        tokens(0)
+      );
+      expect(await exchange.user_balance(token1.address, user2.address)).equal(
+        tokens(1)
+      );
+      expect(
+        await exchange.user_balance(token1.address, feeCollector.address)
+      ).equal(tokens(0));
+
+      expect(await exchange.user_balance(dai.address, user1.address)).equal(
+        tokens(1)
+      );
+      expect(await exchange.user_balance(dai.address, user2.address)).equal(
+        tokens(0.9)
+      );
+      expect(
+        await exchange.user_balance(dai.address, feeCollector.address)
+      ).equal(
+        tokens(0.1) // fee was paid
+      );
+    });
+    it("update trades when successful", async function () {
+      const {
+        owner,
+        user1,
+        user2,
+        exchange,
+        tokens,
+        feeCollector,
+        token1,
+        dai,
+      } = await loadFixture(brokerTradeFixture);
+      expect(await exchange.tradeSuccessful(1)).equal(true);
+    });
+    it("Success event", async function () {
+      const {
+        tx5,
+        owner,
+        user1,
+        user2,
+        exchange,
+        tokens,
+        feeCollector,
+        token1,
+        dai,
+      } = await loadFixture(brokerTradeFixture);
+      await expect(tx5)
+        .emit(exchange, "Success")
+        .withArgs(
+          await exchange.tradesCount(),
+          user2.address,
+          dai.address,
+          tokens(1),
+          token1.address,
+          tokens(1),
+          user1.address,
+          await exchange.user_balance(dai.address, feeCollector.address),
+
+          await time.latest() // blockstamp
+        );
+    });
+
+    it("Fail if real order", async function () {
+      const {
+        tx5,
+        owner,
+        user1,
+        user2,
+        exchange,
+        tokens,
+        feeCollector,
+        token1,
+        dai,
+      } = await loadFixture(brokerTradeFixture);
+
+      await expect(exchange.connect(user2).brokerTrade(98679567)).reverted;
+    });
+    it("Fail if not owner of trade id", async function () {
+      const {
+        tx5,
+        owner,
+        user1,
+        user2,
+        exchange,
+        tokens,
+        feeCollector,
+        token1,
+        dai,
+      } = await loadFixture(brokerTradeFixture);
+
+      await tx5.wait();
+      // try to broker again
+      await expect(exchange.connect(user2).brokerTrade(1)).reverted;
+    });
+
+    it("Rejects cancel orders", async function () {
+      const {
+        tx5,
+        owner,
+        user1,
+        user2,
+        exchange,
+        tokens,
+        feeCollector,
+        token1,
+        dai,
+      } = await loadFixture(brokerTradeFixture);
+      await exchange.connect(user1).cancelTrade(1);
+      await tx5.wait();
+      // try to broker again
+      await expect(exchange.connect(user2).brokerTrade(1)).reverted;
     });
   });
 });
