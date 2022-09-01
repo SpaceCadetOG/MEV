@@ -1,4 +1,4 @@
-const { ethers, hre } = require("hardhat");
+const { ethers} = require("hardhat");
 const config = require("../src/config.json");
 async function main() {
   const tokens = (n) => {
@@ -127,7 +127,7 @@ async function main() {
       tokens(10)
     );
     results = await tx.wait();
-    console.log(`Trade Success ${deployer.address} /n`);
+    console.log(`Trade Success ${deployer.address} \n`);
   }
   await wait(1);
 
@@ -139,7 +139,7 @@ async function main() {
       tokens(10 * i)
     );
     results = await tx.wait();
-    console.log(`Trade Success ${user1.address} /n`);
+    console.log(`Trade Success ${user1.address} \n`);
   }
   await wait(1);
 }

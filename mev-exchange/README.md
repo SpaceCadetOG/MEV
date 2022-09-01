@@ -1,15 +1,17 @@
 # MEV Exchange
+MEV Protection Exchange
 
-- MEV Protection Exchange
+- *run node* =>
 
-*node*
-npx hardhat node --fork https://RPC_HERE
+1. npx hardhat node 
 
-*test*
-npx hardhat test --network local 
-npx hardhat coverage
+- *test* =>
 
-*deploy*
-npx hardhat run --network local scripts/1_deploy.js
-npx hardhat run --network local scripts/2_interaction_exchange.js
+1. npx hardhat test --network local 
+2. npx hardhat coverage
+
+- *deploy* =>
+
+1. npx hardhat run --network local scripts/1_deploy.js
+2. npx hardhat run --network local scripts/2_interaction_exchange.js
 

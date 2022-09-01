@@ -1,4 +1,4 @@
-const { ethers, hre } = require("hardhat");
+const { ethers } = require("hardhat");
 
 async function main() {
   console.log(`Deploying NOW...\n`);
