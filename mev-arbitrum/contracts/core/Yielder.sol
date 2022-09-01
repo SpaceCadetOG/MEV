@@ -9,10 +9,15 @@ contract Yielder {
     address internal profit_oracle;
 
     enum Protocol {
+        GMX
+    }
+
+    enum Lender {
         Aave,
-        Compound,
         UniswapV3
     }
+
+    //
 
     Protocol public currentPlace;
 

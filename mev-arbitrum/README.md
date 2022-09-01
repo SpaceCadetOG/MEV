@@ -1,13 +1,42 @@
 # Sample Hardhat Project
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+[] Uniswap V3
+    - swap  [x]
+    - supply liquidity []
+    - capital management []
+    - Flashswap []
+[] Aave
+    - Supply []
+    - Borrow []
+    - Repay []
+    - Withdraw []
+    - Flashloan [x]
+    - Liquidate []
+[] GMX
+    - Swap [x]
+    - Leverage []
+    - GLP []
+    - Liquidate []
+[] Sushi
+    - Swap []
+    - CrossChain-Swap []
 
-Try running some of the following tasks:
+[] Paraswap
+    - Swap []
+    - CrossChain-Swap []
 
-```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
-```
+[] MyCelium
+    - Swap []
+    - Leverage []
+    - MLP []
+    - Liquidate []
+
+[] Sperax
+    - Swap []
+    - Leverage []
+    - MLP []
+    - Liquidate []
+
+
+
+

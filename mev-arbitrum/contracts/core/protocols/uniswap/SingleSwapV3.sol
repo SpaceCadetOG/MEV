@@ -27,26 +27,28 @@ contract SingleSwapV3 {
 
     // fee 0.3%
 
-    function swapExactInputSingle(uint256 amountIn, address tokenOut)
-        external
-        returns (uint256 amountOut)
-    {
+
+    function swapExactInputSingle(
+        address tokenIn,
+        uint256 amountIn,
+        address tokenOut
+    ) external returns (uint256 amountOut) {
         // msg.sender must approve this contract
 
         // Transfer the specified amount of DAI to this contract.
         TransferHelper.safeTransferFrom(
-            WETH9,
+            tokenIn,
             msg.sender,
             address(this),
             amountIn
         );
 
         // Approve the router to spend DAI.
-        TransferHelper.safeApprove(WETH9, address(swapRouter), amountIn);
+        TransferHelper.safeApprove(tokenIn, address(swapRouter), amountIn);
 
         ISwapRouter.ExactInputSingleParams memory params = ISwapRouter
             .ExactInputSingleParams({
-                tokenIn: WETH9,
+                tokenIn: tokenIn,
                 tokenOut: tokenOut,
                 fee: poolFee3,
                 recipient: msg.sender,
@@ -61,13 +63,14 @@ contract SingleSwapV3 {
     }
 
     function swapExactOutputSingle(
+        address tokenIn,
         address tokenOut,
         uint256 amountOut,
         uint256 amountInMaximum
     ) external returns (uint256 amountIn) {
         // Transfer the specified amount of DAI to this contract.
         TransferHelper.safeTransferFrom(
-            WETH9,
+            tokenIn,
             msg.sender,
             address(this),
             amountInMaximum
@@ -79,7 +82,7 @@ contract SingleSwapV3 {
 
         ISwapRouter.ExactOutputSingleParams memory params = ISwapRouter
             .ExactOutputSingleParams({
-                tokenIn: WETH9,
+                tokenIn: tokenIn,
                 tokenOut: tokenOut,
                 fee: poolFee3,
                 recipient: msg.sender,
@@ -97,7 +100,7 @@ contract SingleSwapV3 {
         if (amountIn < amountInMaximum) {
             TransferHelper.safeApprove(WETH9, address(swapRouter), 0);
             TransferHelper.safeTransfer(
-                WETH9,
+                tokenIn,
                 msg.sender,
                 amountInMaximum - amountIn
             );
