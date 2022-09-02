@@ -10,7 +10,7 @@ import "hardhat/console.sol";
 // Arbitrager = gmx / Mycelium hack
 // WETH(aave) => ETH(GMX) => WETH(myCeli) => WETH(aave) - WETH(contract) = WETH(user_profit)
 
-contract PerpetuallySwapsETH is FlashLoanSimpleReceiverBase {
+contract PerpetuallySwapsETH2 is FlashLoanSimpleReceiverBase {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     address constant ETHER = address(0);

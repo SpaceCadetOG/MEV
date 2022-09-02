@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity 0.8.10;
 // finish contract => https://pro.eattheblocks.com/courses/588302/lectures/11393660
-import "contracts/oracles/profit-oracle.sol";
+import "contracts/oracles/profits/profit-oracle.sol";
 
 // liquidation
 contract Taker {

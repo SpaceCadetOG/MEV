@@ -1,45 +1,39 @@
-# Sample Hardhat Project
+# MEV Arbitrum Project
 
-[] Uniswap V3
-    - swap  [x]
+1. Uniswap V3
+    - Single Hop [x]
+    - Multi Hop [x]
     - supply liquidity []
     - capital management []
     - Flashswap []
-[] Aave
+2. Aave
     - Supply []
     - Borrow []
     - Repay []
     - Withdraw []
     - Flashloan [x]
     - Liquidate []
-[] GMX
-    - Swap [x]
-    - Leverage []
+3. GMX
+    - Swap Tokens for Tokens [x]
+    - Swap ETH for Tokens [x]
+    - Swap Tokens for ETH [x]
+    - Leverage Trade []
     - GLP []
     - Liquidate []
-[] Sushi
+4. Sushi
     - Swap []
     - CrossChain-Swap []
 
-[] Paraswap
+5. Sperax
+
+6. Paraswap
     - Swap []
     - CrossChain-Swap []
-
-[] MyCelium
-    - Swap []
-    - Leverage []
-    - MLP []
-    - Liquidate []
-
-[] Sperax
-    - Swap []
-    - Leverage []
-    - MLP []
-    - Liquidate []
 
 
 
 Nitro Update => Post 8-31-22 (https://github.com/NomicFoundation/hardhat/issues/2995)
+-Review *hardhat.config.js file in networks* 
 1. hh node --fork https://arb1.arbitrum.io/rpc --fork-ignore-unknown-tx-type true
 2. hh test --network local test/chainlink/getPrice.test.js 
 3. hh test --network local test/uniswap/uniswap-v3-twap.test.js 
