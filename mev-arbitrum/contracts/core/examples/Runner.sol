@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity 0.8.0;
-// finish contract => https://pro.eattheblocks.com/courses/588302/lectures/11393660
-import "./protocols/uniswap/SingleSwapV3.sol";
-import "./protocols/uniswap/MultiSwapV3.sol";
+import "../protocols/uniswap/SingleSwapV3.sol";
+import "../protocols/uniswap/MultiSwapV3.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 // Arbitrager
@@ -85,11 +84,7 @@ contract Dex {
 
     // uniswap v3 || gmx
 
-    function getPrice(address _token)
-        external
-        view
-        returns (uint256 price)
-    {
+    function getPrice(address _token) external view returns (uint256 price) {
         price = prices[_token];
         return price;
     }

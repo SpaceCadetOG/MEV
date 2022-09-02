@@ -64,7 +64,7 @@ describe("Using GMX", function () {
       console.log(`GMX Prices Feed: ${pricefeed}`);
     });
 
-    it("should get price of wavax and eth gmx", async function () {
+    it("should get price of wbtc and eth gmx", async function () {
       const { gmx } = await loadFixture(deployFixture);
       const avax_price = ethers.utils.formatUnits(
         await gmx.getPriceOnGMX("0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f"),
@@ -142,7 +142,7 @@ describe("Using GMX", function () {
       );
     });
 
-    it("get GLP Amount GMX", async function () {
+    it.skip("get GLP Amount GMX", async function () {
       const { gmx, usdc } = await loadFixture(deployFixture);
     });
 
@@ -162,7 +162,7 @@ describe("Using GMX", function () {
       console.log(price);
     });
 
-    it("Add Liquidity on GMX", async function () {
+    it.skip("Add Liquidity on GMX", async function () {
       const { gmx, usdc } = await loadFixture(deployFixture);
     });
   });

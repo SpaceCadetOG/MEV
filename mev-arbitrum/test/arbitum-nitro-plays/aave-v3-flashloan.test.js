@@ -18,6 +18,7 @@ describe("Aave", function () {
 
   async function deployFixture() {
 
+
     // Contracts are deployed using the first signer/account by default
     const owner = await ethers.getSigner();
     let whale,
@@ -83,7 +84,7 @@ describe("Aave", function () {
     const lending = await Lending.deploy(owner.address);
     lending.deployed();
 
-    const Loan = await ethers.getContractFactory("PerpetuallySwapsETH");
+    const Loan = await ethers.getContractFactory("AaveFlashloan");
     const loan = await Loan.deploy(
       "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb"
     );

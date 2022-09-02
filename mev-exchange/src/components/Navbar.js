@@ -1,65 +1,83 @@
-import { useSelector, useDispatch } from 'react-redux'
-import Blockies from 'react-blockies'
+import { useSelector, useDispatch } from "react-redux";
+import Blockies from "react-blockies";
 
-import logo from '../assets/logo.png'
-import eth from '../assets/eth.svg'
+import logo from "../assets/logo.png";
+import eth from "../assets/eth.svg";
 
-import { loadAccount } from '../store/interactions'
+import { loadAccount } from "../store/interactions";
 
-import config from '../config.json';
+import config from "../config.json";
 
 const Navbar = () => {
-  const provider = useSelector(state => state.provider.blockchain)
-  const chainId = useSelector(state => state.provider.chainId)
-  const account = useSelector(state => state.provider.account)
-  const balance = useSelector(state => state.provider.balance)
+  const provider = useSelector((state) => state.provider.blockchain);
+  const chainId = useSelector((state) => state.provider.chainId);
+  const account = useSelector((state) => state.provider.account);
+  const balance = useSelector((state) => state.provider.balance);
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const connectHandler = async () => {
-    await loadAccount(provider, dispatch)
-  }
+    await loadAccount(provider, dispatch);
+  };
 
   const networkHandler = async (e) => {
     await window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
+      method: "wallet_switchEthereumChain",
       params: [{ chainId: e.target.value }],
-    })
-  }
+    });
+  };
 
-  return(
-    <div className='exchange__header grid'>
-      <div className='exchange__header--brand flex'>
+  return (
+    <div className="exchange__header grid">
+      <div className="exchange__header--brand flex">
         <img src={logo} className="logo" alt="DApp Logo"></img>
         <h1>MEV Exchange</h1>
       </div>
 
-      <div className='exchange__header--networks flex'>
-        <img src={eth} alt="ETH Logo" className='Eth Logo' />
+      <div className="exchange__header--networks flex">
+        <img src={eth} alt="ETH Logo" className="Eth Logo" />
 
         {chainId && (
-          <select name="networks" id="networks" value={config[chainId] ? `0x${chainId.toString(16)}` : `0`} onChange={networkHandler}>
-            <option value="0" disabled>Select Network</option>
-                      <option value="0x7A69">Local</option>
-            <option value="0x2a">Kovan</option>
+          <select
+            name="networks"
+            id="networks"
+            value={config[chainId] ? `0x${chainId.toString(16)}` : `0`}
+            onChange={networkHandler}
+          >
+            <option value="0" disabled>
+              Select Network
+            </option>
+            <option value="0x7A69">Local</option>
+            <option value="0x1">Ethereum</option>
+            <option value="0xA4b1">Arbitrum-Nitro</option>
+            <option value="0xa4ba">Arbitrum-Nova</option>
+            <option value="0x66eed">Nitro-Testnet</option>
           </select>
         )}
-
       </div>
 
-      <div className='exchange__header--account flex'>
+      <div className="exchange__header--account flex">
         {balance ? (
-          <p><small>My Balance</small>{Number(balance).toFixed(4)}</p>
+          <p>
+            <small>My Balance</small>
+            {Number(balance).toFixed(4)}
+          </p>
         ) : (
-          <p><small>My Balance</small>0 ETH</p>
+          <p>
+            <small>My Balance</small>0 ETH
+          </p>
         )}
         {account ? (
           <a
-            href={config[chainId] ? `${config[chainId].explorerURL}/address/${account}` : `#`}
-            target='_blank'
-            rel='noreferrer'
+            href={
+              config[chainId]
+                ? `${config[chainId].explorerURL}/address/${account}`
+                : `#`
+            }
+            target="_blank"
+            rel="noreferrer"
           >
-            {account.slice(0,5) + '...' + account.slice(38,42)}
+            {account.slice(0, 5) + "..." + account.slice(38, 42)}
             <Blockies
               seed={account}
               size={10}
@@ -71,11 +89,13 @@ const Navbar = () => {
             />
           </a>
         ) : (
-          <button className="button" onClick={connectHandler}>Connect</button>
+          <button className="button" onClick={connectHandler}>
+            Connect
+          </button>
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default Navbar;

@@ -210,7 +210,7 @@ describe("Aave", function () {
         console.log('_______________________________________________________________________________________')
       });
     });
-    describe("Deposit", () =>
+    describe.skip("Deposit", () =>
       {
       it("it should deposit Dai into aave", async function () {
         const {
@@ -306,13 +306,6 @@ describe("Aave", function () {
 
     describe.skip("Repay", () => {
       it("it should repay into aave", async function ()
-      {
-        console.log('_______________________________________________________________________________________')
-      });
-    });
-
-    describe.skip("Flashloan", () => {
-      it("it should flash w/ aave", async function ()
       {
         console.log('_______________________________________________________________________________________')
       });

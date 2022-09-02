@@ -57,7 +57,7 @@
     "@typechain/hardhat": "^6.1.2",
     "chai": "^4.3.6",
     "ethers": "^5.7.0",
-    "hardhat": "^2.10.2",
+    "hardhat": "npm:@gzeoneth/hardhat@^2.10.1-gzeon-c8fe47dd4",
     "hardhat-gas-reporter": "^1.0.8",
     "solidity-coverage": "^0.7.21",
     "typechain": "^8.1.0"

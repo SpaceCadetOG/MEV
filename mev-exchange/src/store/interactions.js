@@ -1,55 +1,70 @@
-import { ethers } from 'ethers'
-import TOKEN_ABI from '../abis/Token.json';
-import EXCHANGE_ABI from '../abis/Exchange.json';
-
+import { ethers } from "ethers";
+import TOKEN_ABI from "../abis/Token.json";
+import EXCHANGE_ABI from "../abis/Exchange.json";
 
 export const loadProvider = (dispatch) => {
-  const blockchain = new ethers.providers.Web3Provider(window.ethereum)
-  dispatch({ type: 'PROVIDER_LOADED', blockchain })
+  const blockchain = new ethers.providers.Web3Provider(window.ethereum);
+  dispatch({ type: "PROVIDER_LOADED", blockchain });
 
-  return blockchain
-}
+  return blockchain;
+};
 
 export const loadNetwork = async (provider, dispatch) => {
-  const { chainId } = await provider.getNetwork()
-  dispatch({ type: 'NETWORK_LOADED', chainId })
+  const { chainId } = await provider.getNetwork();
+  dispatch({ type: "NETWORK_LOADED", chainId });
 
-  return chainId
-}
+  return chainId;
+};
 
 export const loadAccount = async (provider, dispatch) => {
-  const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-    const account = ethers.utils.getAddress(accounts[0])
+  const accounts = await window.ethereum.request({
+    method: "eth_requestAccounts",
+  });
+  const account = ethers.utils.getAddress(accounts[0]);
 
-    dispatch({ type: 'ACCOUNT_LOADED', account })
-    
-  let balance = await provider.getBalance(account)
-    balance = ethers.utils.formatEther(balance)
-    dispatch({ type: 'ETHER_BALANCE_LOADED', balance })
-  return account
-}
+  dispatch({ type: "ACCOUNT_LOADED", account });
+
+  let balance = await provider.getBalance(account);
+  balance = ethers.utils.formatEther(balance);
+  dispatch({ type: "ETHER_BALANCE_LOADED", balance });
+  return account;
+};
 
 export const loadTokens = async (provider, addresses, dispatch) => {
-  let token, symbol
+  let token, symbol;
 
-  token = new ethers.Contract(addresses[0], TOKEN_ABI, provider)
-  symbol = await token.symbol()
-    dispatch({ type: 'TOKEN_1_LOADED', token, symbol })
-    
-    token = new ethers.Contract(addresses[1], TOKEN_ABI, provider)
-    symbol = await token.symbol()
-    dispatch({ type: 'TOKEN_2_LOADED', token, symbol })
+  token = new ethers.Contract(addresses[0], TOKEN_ABI, provider);
+  symbol = await token.symbol();
+  dispatch({ type: "TOKEN_1_LOADED", token, symbol });
 
-  return token
-}
+  token = new ethers.Contract(addresses[1], TOKEN_ABI, provider);
+  symbol = await token.symbol();
+  dispatch({ type: "TOKEN_2_LOADED", token, symbol });
 
+  return token;
+};
 
 export const loadExchange = async (provider, address, dispatch) => {
-    let exchange
-  
-      exchange = new ethers.Contract(address[1], EXCHANGE_ABI, provider)
+  let exchange;
 
-      dispatch({ type: 'EXCHANGE_LOADED', exchange })
-  
-    return exchange
-  }
+  exchange = new ethers.Contract(address[1], EXCHANGE_ABI, provider);
+
+  dispatch({ type: "EXCHANGE_LOADED", exchange });
+
+  return exchange;
+};
+
+export const loadBalances = async (exchange, tokens, account, dispatch) => {
+  let balance = ethers.utils.formatUnits(await tokens[0].balanceOf(account), 18)
+  dispatch({ type: 'TOKEN_1_BALANCE_LOADED', balance })
+
+  balance = ethers.utils.formatUnits(await exchange.user_balance(tokens[0].address, account), 18)
+  dispatch({ type: 'EXCHANGE_TOKEN_1_BALANCE_LOADED', balance })
+
+  balance = ethers.utils.formatUnits(await tokens[1].balanceOf(account), 18)
+  dispatch({ type: 'TOKEN_2_BALANCE_LOADED', balance })
+
+  balance = ethers.utils.formatUnits(await exchange.user_balance(tokens[1].address, account), 18)
+  dispatch({ type: 'EXCHANGE_TOKEN_2_BALANCE_LOADED', balance })
+
+}

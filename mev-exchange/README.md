@@ -2,16 +2,13 @@
 MEV Protection Exchange
 
 - *run node* =>
-
-1. npx hardhat node 
+1. hh node 
 
 - *test* =>
-
-1. npx hardhat test --network local 
-2. npx hardhat coverage
+1. hh test --network local 
+2. hh coverage
 
 - *deploy* =>
-
-1. npx hardhat run --network local scripts/1_deploy.js
-2. npx hardhat run --network local scripts/2_interaction_exchange.js
+1. hh run --network local scripts/1_deploy.js
+2. hh run --network local scripts/2_interaction_exchange.js
 

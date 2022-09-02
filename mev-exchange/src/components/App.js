@@ -6,9 +6,10 @@ import {
   loadProvider,
   loadNetwork,
   loadAccount,
-  loadTokens,
   loadExchange,
+  loadTokens,
 } from "../store/interactions";
+import Balance from "./Balance";
 import Markets from "./Markets";
 
 import Navbar from "./Navbar";
@@ -37,13 +38,16 @@ function App() {
 
     const MEV = config[chainId].MEV;
     const WETH = config[chainId].WETH;
-    // const EXCHANGE = config[chainId].exchange;
+    const DAI = config[chainId].DAI;
+    const EXCHANGE = config[chainId].exchange;
 
     await loadTokens(provider, [MEV.address, WETH.address], dispatch);
+    await loadTokens(provider, [MEV.address, DAI.address], dispatch);
 
     // Load exchange smart contract
-    const exchangeConfig = config[chainId].exchange;
+    const exchangeConfig = EXCHANGE;
     await loadExchange(provider, exchangeConfig.address, dispatch);
+
   };
 
   useEffect(() => {
@@ -58,7 +62,7 @@ function App() {
         <section className="exchange__section--left grid">
           {<Markets />}
 
-          {/* Balance */}
+          {<Balance />}
 
           {/* Order */}
         </section>
