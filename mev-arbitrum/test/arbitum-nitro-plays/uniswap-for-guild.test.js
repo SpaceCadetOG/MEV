@@ -105,7 +105,7 @@ describe("UniswapV3 SWAP", () => {
 
   });
 
-  it(" WETH => DAI on Uniswap  => 0.03%", async () => {
+  it.skip(" WETH => DAI on Uniswap  => 0.03%", async () => {
     const { twap, owner, ethAmount, dai , testChainlink, weth } = await loadFixture(deployFixture);
     
     amount = 10n ** 18n

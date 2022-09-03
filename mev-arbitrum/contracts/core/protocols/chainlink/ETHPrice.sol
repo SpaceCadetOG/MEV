@@ -26,7 +26,7 @@ contract ArbitrumPrices {
             uint80 answeredInRound
         ) = eth.latestRoundData();
         // for ETH / USD price is scaled up by 10 ** 8
-        return uint(price / 1e8);
+        return uint256(price / 1e8);
     }
 
     function getLatestPriceAVAX() public view returns (uint) {

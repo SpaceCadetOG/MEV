@@ -34,7 +34,6 @@ describe("Using GMX", function () {
       "function approve(address spender, uint256 amount) external returns (bool)",
       "function transferFrom(address from, address to, uint256 amount) external returns (bool)",
     ];
-
     const WETHAbi = [
       "function deposit() external payable",
       "function withdraw(uint) external",
@@ -66,20 +65,6 @@ describe("Using GMX", function () {
       console.log(`GMX Prices Feed: ${pricefeed}`);
     });
 
-    it("should get price of wavax and eth gmx", async function () {
-      const { gmx } = await loadFixture(deployFixture);
-      const avax_price = ethers.utils.formatUnits(
-        await gmx.getPriceOnGMX("0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f"),
-        30
-      );
-      console.log(`GMX Prices of WBTC: ${avax_price}`);
-      const eth_price = ethers.utils.formatUnits(
-        await gmx.getPriceOnGMX("0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"),
-        30
-      );
-      console.log(`GMX Prices of ETH: ${eth_price}`);
-    });
-
     it("get Pool Amount to take Postion GMX", async function () {
       const { gmx, usdc } = await loadFixture(deployFixture);
       amountIn = 1n * 10n ** 18n;
@@ -98,7 +83,7 @@ describe("Using GMX", function () {
       );
     });
 
-    it("Open Postion on GMX", async function () {
+    it.only("Open Postion on GMX", async function () {
       const { gmx, usdc, weth, testChainlink, ethAmount, user } =
         await loadFixture(deployFixture);
       amountIn = 1n * 10n ** 18n;
@@ -113,7 +98,7 @@ describe("Using GMX", function () {
 
       expect(await gmx.fee()).equal(100000000000000);
       
-      gmx.OpenPositionGMX(WETH, usdc.address, amountIn)
+      await gmx.OpenPositionGMX(WETH, usdc.address, amountIn)
 
     });
 

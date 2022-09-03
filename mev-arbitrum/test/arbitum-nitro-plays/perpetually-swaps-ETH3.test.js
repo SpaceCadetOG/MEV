@@ -9,7 +9,7 @@ const { ethers } = require("hardhat");
 const DAI = "0xd586E7F844cEa2F87f50152665BCbc2C279D8d70";
 const aDAI = "0x82E64f49Ed5EC1bC6e43DAD4FC8Af9bb3A2312EE";
 const debt_USDC = "0xE4922afAB0BbaDd8ab2a88E0C79d884Ad337fcA6";
-const DAI_WHALE = "0x4b4e5223e45CB74f05c352a657FF6b4c5482Ea52"; // find whale on etherscan => Look for exchanges like FTX || Binacne || Coinbase
+const DAI_WHALE = "0xBA479d5585EcEC47eDc2a571dA430A40f43c3851"; // find whale on etherscan => Look for exchanges like FTX || Binacne || Coinbase
 const USDC_WHALE = "0xBA479d5585EcEC47eDc2a571dA430A40f43c3851";
 const USDC = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8";
 const address_provider = "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5";
@@ -24,7 +24,7 @@ describe("Aave", function () {
       whale2,
       dai,
       a_dai,
-      usdc,
+      usdc, weth,
       borrowAmount,
       fundAmount,
       fee,
@@ -59,11 +59,11 @@ describe("Aave", function () {
     whale = await ethers.getSigner(DAI_WHALE);
     whale2 = await ethers.getSigner(USDC_WHALE);
 
-    fundAmount = 20000n * 10n ** 18n; // 20000 dai
+    fundAmount = 2000n * 10n ** 18n; // 20000 dai
     borrowAmount = 1000n * 10n ** 18n; // 10000 dai
     fee = 10n * 10n ** 18n; // 10000 dai
 
-    fundAmount2 = 20000n * 10n ** 6n; // 20000 dai
+    fundAmount2 = 2000n * 10n ** 6n; // 20000 dai
     borrowAmount2 = 1000n * 10n ** 6n; // 10000 dai
     fee2 = 10n * 10n ** 6n; // 10000 dai
 
@@ -83,25 +83,25 @@ describe("Aave", function () {
     const lending = await Lending.deploy(owner.address);
     lending.deployed();
 
-    const Loan = await ethers.getContractFactory("PerpetuallySwapsETH");
+    const Loan = await ethers.getContractFactory("PerpetuallySwapsETH2");
     const loan = await Loan.deploy(
       "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb"
     );
     loan.deployed();
 
     list = await lending.AaveReserveList();
-    console.log(`Dai: ${list[0]}`);
-    console.log(`Link: ${list[1]}`);
-    console.log(`USDC: ${list[2]}`);
-    console.log(`WBTC: ${list[3]}`);
-    console.log(`WETH: ${list[4]}`);
-    console.log(`USDt: ${list[5]}`);
-    console.log(`Aave: ${list[6]}`);
+    // console.log(`Dai: ${list[0]}`);
+    // console.log(`Link: ${list[1]}`);
+    // console.log(`USDC: ${list[2]}`);
+    // console.log(`WBTC: ${list[3]}`);
+    // console.log(`WETH: ${list[4]}`);
+    // console.log(`USDt: ${list[5]}`);
+    // console.log(`Aave: ${list[6]}`);
 
     dai = await ethers.getContractAt(TokenAbi, list[0]);
     usdc = await ethers.getContractAt(TokenAbi, list[2]);
+    weth = await ethers.getContractAt(TokenAbi, list[4]);
     reserve = await lending.AaveReserveData(dai.address);
-    a_dai = await ethers.getContractAt(aTokenAbi, reserve[8]);
 
     paybackAmount = borrowAmount + fee;
     paybackAmount2 = borrowAmount2 + fee2;

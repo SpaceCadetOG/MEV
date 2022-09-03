@@ -11,16 +11,13 @@ import "hardhat/console.sol";
 
 // import "../lib/UTILS.sol";
 // change to arbitrum
-contract PerpetuallySwapsETH1 is GMX_STRUCTS {
+contract PerpetuallySwapsETH3 is GMX_STRUCTS {
     Vault private vault = Vault(0x489ee077994B6658eAfA855C308275EAd8097C4A);
     Router private router = Router(0xaBBc5F99639c9B6bCb58544ddf04EFA6802F4064);
     Reader private reader = Reader(0x22199a49A999c351eF7927602CFB187ec3cae489);
     address priceFeedAddress = getPriceFeedGMX();
     IVaultPriceFeed vaultPrices = IVaultPriceFeed(priceFeedAddress);
-    PositionManager private manager =
-        PositionManager(0x3892b8cF646b17709C91E653319bA5504a5FEafe);
-    PositionRouter private position_router =
-        PositionRouter(0xE510571cAc76279DADf6c4b6eAcE5370F86e3dC2);
+
     address private constant WETH = 0x82aF49447D8a07e3bd95BD0d56f35241523fBab1;
     address constant ETHER = address(0);
 
@@ -43,18 +40,6 @@ contract PerpetuallySwapsETH1 is GMX_STRUCTS {
 
     function getPriceOnMC(address asset) public view returns (uint256) {
         return mc.vaultPrices.getPrice(asset, false, false, false);
-    }
-
-    function BuySellIndicator(address asset)
-        public
-        view
-        returns (string memory)
-    {
-        if (getPriceOnMC(asset) > getPriceOnGMX(asset)) {
-            return "buy on GMX => Sell on MC";
-        } else {
-            return "buy on MC => Sell on GMX";
-        }
     }
 
     function TokenAmountToUSDMinOnGMX(address _tokenIn, uint256 _amount)
@@ -94,6 +79,7 @@ contract PerpetuallySwapsETH1 is GMX_STRUCTS {
         return profit;
     }
 
+
     // get amounts out and get amount in
     function getAmountsInOnGMX(address _tokenIn, address _tokenOut)
         external
@@ -126,6 +112,10 @@ contract PerpetuallySwapsETH1 is GMX_STRUCTS {
     ) public view returns (uint256, uint256) {
         return mc.reader.getAmountOut(vault, _tokenIn, _tokenOut, _amount);
     }
+
+    // potential trade
+    // potential true trade
+
 
     function getTokensAvailableInGMXPool(address asset)
         external
@@ -171,7 +161,6 @@ contract PerpetuallySwapsETH1 is GMX_STRUCTS {
         router.swap(path, _amount, _amountOutMin, msg.sender);
         console.log("Swapped On GMX");
     }
-
     function swapOnMC(
         address _tokenIn,
         address _tokenOut,
@@ -202,7 +191,6 @@ contract PerpetuallySwapsETH1 is GMX_STRUCTS {
         router.swap(path, _amount, _amountOutMin, msg.sender);
         console.log("Swapped On MC");
     }
-
     function swapETHOnGMX(address _tokenOut) external payable {
         address[] memory path;
 
@@ -210,60 +198,13 @@ contract PerpetuallySwapsETH1 is GMX_STRUCTS {
         path[0] = WETH;
         path[1] = _tokenOut;
 
-        uint256 _amountOutMin = TokenAmountToUSDMinOnGMX(WETH, msg.value);
+        (uint256 _amountOutMin) =  TokenAmountToUSDMinOnGMX(WETH, msg.value);
         gmx.router.swapETHToTokens(path, _amountOutMin, msg.sender);
     }
-
-    function OpenPositionGMX(
-        address[] memory _path,
-        address _indexToken,
-        uint256 _amount,
-        uint256 _minOut,
-        uint256 _sizeDelta,
-        uint256 _acceptablePrice,
-        uint256 _executionFee,
-        bytes32 _referralCode
-    ) external payable {
-        // console.log(position_router.minExecutionFee());
-        require(msg.value >= position_router.minExecutionFee(), 'need more to execute');
-        address[] memory path;
-        path = new address[](2);
-
-        IERC20(_path[0]).transferFrom(msg.sender, address(this), _amount);
-        console.log("transferFrom");
-        IERC20(_path[0]).approve(
-            0x3cd2F02B9e39ccC781d0C07fc0286F654e53A76D,
-            _amount
-        );
-        console.log("approve gmx");
-        mc.router.approvePlugin(0x3cd2F02B9e39ccC781d0C07fc0286F654e53A76D);
-        console.log("approve plugin");
-        mc.router.directPoolDeposit(_path[0], _amount);
-        console.log("deposit gmx");
-        bytes32 key = position_router.getRequestKey(msg.sender, 1);
-        console.log("gmx key");
-        position_router.createIncreasePosition(
-            _path,
-            _indexToken,
-            _amount,
-            _minOut,
-            _sizeDelta,
-            true,
-            _acceptablePrice,
-            msg.value,
-            _referralCode
-        );
-        console.log("createIncreasePosition");
-        position_router.executeIncreasePosition(key, payable(msg.sender));
-        console.log("executeIncreasePosition");
-
-        /**
- * 1. A user sends the request to increase / decrease a position to the PositionRouter
-2. A keeper requests the index price from an aggregate of exchanges
-3. The keeper then executes the position at the current index price
-4. If the position cannot be executed within the allowed slippage the request is cancelled and the funds are sent back to the user
- */
-    }
-
+    // Pricing => No price impact for trades...execute trades at mark price [price api for chainlink => https://api.gmx.io/prices]
+    // Stats per assets => [https://gmxio.gitbook.io/gmx/api]
+    // Execution Fee => for all transactions
     receive() external payable {}
 }
+
+

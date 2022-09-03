@@ -17,7 +17,7 @@
     - Swap Tokens for Tokens [x]
     - Swap ETH for Tokens [x]
     - Swap Tokens for ETH [x]
-    - Leverage Trade []
+    - Leverage Trade [] *keep getting 'PositionRouter: invalid msg.value'*
     - GLP []
     - Liquidate []
 4. Sushi

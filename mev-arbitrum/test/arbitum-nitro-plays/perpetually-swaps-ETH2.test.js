@@ -18,14 +18,13 @@ describe("Aave", function () {
 
   async function deployFixture() {
 
-
     // Contracts are deployed using the first signer/account by default
     const owner = await ethers.getSigner();
     let whale,
       whale2,
       dai,
       a_dai,
-      usdc,
+      usdc, weth,
       borrowAmount,
       fundAmount,
       fee,
@@ -60,11 +59,11 @@ describe("Aave", function () {
     whale = await ethers.getSigner(DAI_WHALE);
     whale2 = await ethers.getSigner(USDC_WHALE);
 
-    fundAmount = 20000n * 10n ** 18n; // 20000 dai
+    fundAmount = 2000n * 10n ** 18n; // 20000 dai
     borrowAmount = 1000n * 10n ** 18n; // 10000 dai
     fee = 10n * 10n ** 18n; // 10000 dai
 
-    fundAmount2 = 20000n * 10n ** 6n; // 20000 dai
+    fundAmount2 = 2000n * 10n ** 6n; // 20000 dai
     borrowAmount2 = 1000n * 10n ** 6n; // 10000 dai
     fee2 = 10n * 10n ** 6n; // 10000 dai
 
@@ -84,25 +83,25 @@ describe("Aave", function () {
     const lending = await Lending.deploy(owner.address);
     lending.deployed();
 
-    const Loan = await ethers.getContractFactory("AaveFlashloan");
+    const Loan = await ethers.getContractFactory("PerpetuallySwapsETH2");
     const loan = await Loan.deploy(
       "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb"
     );
     loan.deployed();
 
     list = await lending.AaveReserveList();
-    console.log(`Dai: ${list[0]}`);
-    console.log(`Link: ${list[1]}`);
-    console.log(`USDC: ${list[2]}`);
-    console.log(`WBTC: ${list[3]}`);
-    console.log(`WETH: ${list[4]}`);
-    console.log(`USDt: ${list[5]}`);
-    console.log(`Aave: ${list[6]}`);
+    // console.log(`Dai: ${list[0]}`);
+    // console.log(`Link: ${list[1]}`);
+    // console.log(`USDC: ${list[2]}`);
+    // console.log(`WBTC: ${list[3]}`);
+    // console.log(`WETH: ${list[4]}`);
+    // console.log(`USDt: ${list[5]}`);
+    // console.log(`Aave: ${list[6]}`);
 
     dai = await ethers.getContractAt(TokenAbi, list[0]);
     usdc = await ethers.getContractAt(TokenAbi, list[2]);
+    weth = await ethers.getContractAt(TokenAbi, list[4]);
     reserve = await lending.AaveReserveData(dai.address);
-    a_dai = await ethers.getContractAt(aTokenAbi, reserve[8]);
 
     paybackAmount = borrowAmount + fee;
     paybackAmount2 = borrowAmount2 + fee2;
