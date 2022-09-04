@@ -3,13 +3,14 @@ const {
   loadFixture,
 } = require("@nomicfoundation/hardhat-network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
-const { expect } = require("chai");
+const { expect, use } = require("chai");
 const { ethers } = require("hardhat");
 
+const USDC = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8";
 const DAI = "0xd586E7F844cEa2F87f50152665BCbc2C279D8d70";
 const aDAI = "0x82E64f49Ed5EC1bC6e43DAD4FC8Af9bb3A2312EE";
-const debt_USDC = "0xE4922afAB0BbaDd8ab2a88E0C79d884Ad337fcA6";
-const DAI_WHALE = "0x271461a00e9E280432183f34aD258C2667e26276"; // find whale on etherscan => Look for exchanges like FTX || Binacne || Coinbase
+const debt_USDC = "0xFCCf3cAbbe80101232d343252614b6A3eE81C989";
+const DAI_WHALE = "0xBA479d5585EcEC47eDc2a571dA430A40f43c3851"; // find whale on etherscan => Look for exchanges like FTX || Binacne || Coinbase
 const address_provider = "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5";
 
 describe("Aave", function () {
@@ -50,18 +51,18 @@ describe("Aave", function () {
     const dTokenAbi = [
       "function approveDelegation(address delegatee, uint256 amount)",
     ];
+    // will mock this acct
+    await network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [DAI_WHALE],
+    });
     whale = await ethers.getSigner(DAI_WHALE);
 
     fundAmount = 20000n * 10n ** 18n; // 20000 dai
-    borrowAmount = 5000n * 10n ** 18n; // 10000 dai
+    borrowAmount = 20000n * 10n ** 18n; // 10000 dai
     fee = 10n * 10n ** 18n; // 10000 dai
-    // await dai.connect(whale).transfer(owner.address, fundAmount);
 
-    // user_balance = ethers.utils.formatUnits(
-    //   await dai.balanceOf(owner.address),
-    //   18
-    // );
-    // console.log(`Balance Of user Dai: ${user_balance}`);
+    console.log(`Balance Of user Dai: ${user_balance}`);
 
     ethbalance = await owner.getBalance("latest");
 
@@ -70,7 +71,7 @@ describe("Aave", function () {
     );
 
     const Lending = await ethers.getContractFactory("AaveLendingV3");
-    const lending = await Lending.deploy(owner.address);
+    const lending = await Lending.deploy();
     lending.deployed();
 
     list = await lending.AaveReserveList();
@@ -85,7 +86,17 @@ describe("Aave", function () {
     dai = await ethers.getContractAt(TokenAbi, list[0]);
     reserve = await lending.AaveReserveData(dai.address);
     a_dai = await ethers.getContractAt(aTokenAbi, reserve[8]);
-    console.log('_______________________________________________________________________________________')
+    await dai.connect(whale).transfer(owner.address, fundAmount);
+
+    user_balance = ethers.utils.formatUnits(
+      await dai.balanceOf(owner.address),
+      18
+    );
+    await dai.connect(owner).approve(lending.address, fundAmount);
+
+    console.log(
+      "_______________________________________________________________________________________"
+    );
     return {
       lending,
       unlockTime,
@@ -112,7 +123,9 @@ describe("Aave", function () {
           MaxLoanToValue: ethers.utils.formatUnits(reserve[4], 2),
           HealthFactor: ethers.utils.formatUnits(reserve[5], 18),
         });
-        console.log('_______________________________________________________________________________________')
+        console.log(
+          "_______________________________________________________________________________________"
+        );
       });
       it("it should getReserveTokenAddresses(address asset) ", async function () {
         const { lending, owner, dai, borrowAmount, a_dai } = await loadFixture(
@@ -128,7 +141,9 @@ describe("Aave", function () {
         console.log(`Aave: ${list[6]}`);
         console.log(`STASIS EURS Token: ${list[7]}`);
       });
-      console.log('_______________________________________________________________________________________')
+      console.log(
+        "_______________________________________________________________________________________"
+      );
       it("it should getReserveData(address asset) ", async function () {
         const { lending, owner, dai, borrowAmount, a_dai } = await loadFixture(
           deployFixture
@@ -136,7 +151,9 @@ describe("Aave", function () {
         reserve = await lending.AaveReserveData(dai.address);
         // clean later
         console.log("DAI", reserve);
-        console.log('_______________________________________________________________________________________')
+        console.log(
+          "_______________________________________________________________________________________"
+        );
         price = await lending.GetPriceOnAave(dai.address);
         console.log(
           "dai price",
@@ -166,7 +183,9 @@ describe("Aave", function () {
           AAVE:
             ethers.utils.formatUnits(prices4[1].toString(), "wei") / 100000000,
         });
-        console.log('_______________________________________________________________________________________')
+        console.log(
+          "_______________________________________________________________________________________"
+        );
       });
       it("it should GetPriceOnAave(address asset) ", async function () {
         const { lending, owner, dai, borrowAmount, a_dai } = await loadFixture(
@@ -195,7 +214,9 @@ describe("Aave", function () {
           AAVE:
             ethers.utils.formatUnits(prices4[1].toString(), "wei") / 100000000,
         });
-        console.log('_______________________________________________________________________________________')
+        console.log(
+          "_______________________________________________________________________________________"
+        );
       });
       it("get Dai Address", async function () {
         const { lending, owner, dai, borrowAmount, a_dai } = await loadFixture(
@@ -207,11 +228,9 @@ describe("Aave", function () {
           stableDebtTokenAddress: reserve[9],
           variableDebtTokenAddress: reserve[10],
         });
-        console.log('_______________________________________________________________________________________')
       });
     });
-    describe.skip("Deposit", () =>
-      {
+    describe.only("Deposit", () => {
       it("it should deposit Dai into aave", async function () {
         const {
           lending,
@@ -229,44 +248,12 @@ describe("Aave", function () {
         );
         console.log(`Before balance Of Dai: ${bDai_balance}`);
 
-        await dai.approve(lending.address, fundAmount);
-        await lending.Supply(DAI, fundAmount);
+        await lending.Supply(dai.address, fundAmount);
 
-        // expect(await a_dai.balanceOf(owner.address)).lessThanOrEqual(20000n * 10n ** 18n);
-        let aDai_balance = ethers.utils.formatUnits(
-          await dai.balanceOf(owner.address),
-          18
+        expect(await a_dai.balanceOf(owner.address)).lessThanOrEqual(
+          fundAmount
         );
-        console.log(`After balance Of Dai: ${aDai_balance}`);
-
-        let a_Dai_balance = ethers.utils.formatUnits(
-          await a_dai.balanceOf(owner.address),
-          18
-        );
-        console.log(`balance Of aDai: ${a_Dai_balance}`);
-
-        reserve = await lending.UserAccountData(owner.address);
-
-        console.table({
-          TotalCollateralValue: ethers.utils.formatUnits(reserve[0], 8),
-          TotalAmountBorrowed: ethers.utils.formatUnits(reserve[1], 8),
-          TotalAmountAvalibleToBorrow: ethers.utils.formatUnits(reserve[2], 8),
-          currentLiquidationThreshold: ethers.utils.formatUnits(reserve[3], 2),
-          MaxLoanToValue: ethers.utils.formatUnits(reserve[4], 2),
-          HealthFactor: ethers.utils.formatUnits(reserve[5], 18),
-        });
-
-        await lending.Borrow(USDC, debt_USDC, borrowAmount);
-        console.table({
-          TotalCollateralValue: ethers.utils.formatUnits(reserve[0], 8),
-          TotalAmountBorrowed: ethers.utils.formatUnits(reserve[1], 8),
-          TotalAmountAvalibleToBorrow: ethers.utils.formatUnits(reserve[2], 8),
-          currentLiquidationThreshold: ethers.utils.formatUnits(reserve[3], 2),
-          MaxLoanToValue: ethers.utils.formatUnits(reserve[4], 2),
-          HealthFactor: ethers.utils.formatUnits(reserve[5], 18),
-        });
       });
-      console.log('_______________________________________________________________________________________')
     });
 
     describe.skip("Withdraw", () => {
@@ -286,34 +273,40 @@ describe("Aave", function () {
         );
         console.log(`balance Of aDai: ${a_Dai_balance}`);
         await a_dai.approve(lending.address, borrowAmount);
-        await lending.Withdraw(DAI, 1);
-        expect(await dai.balanceOf(owner.address)).equal(5000n * 10n ** 18n);
+        await lending.Withdraw(DAI, borrowAmount);
+        // expect(await dai.balanceOf(owner.address)).equal(5000n * 10n ** 18n);
       });
-      console.log('_______________________________________________________________________________________')
+      console.log(
+        "_______________________________________________________________________________________"
+      );
     });
 
-    describe.skip("Borrow", () => {
+    describe.only("Borrow", () => {
       it("it should borrow into aave", async function () {
         const { lending, owner, dai, borrowAmount, a_dai, debt_usdc } =
           await loadFixture(deployFixture);
-
-        await lending.Borrow(DAI, borrowAmount);
+        amount = 10n * 10n ** 6n;
+        await lending.Borrow(USDC, debt_USDC, amount);
 
         // await lending.BorrowV2(USDC, borrowAmount);
       });
-      console.log('_______________________________________________________________________________________')
+      console.log(
+        "_______________________________________________________________________________________"
+      );
     });
 
     describe.skip("Repay", () => {
-      it("it should repay into aave", async function ()
-      {
-        console.log('_______________________________________________________________________________________')
+      it("it should repay into aave", async function () {
+        console.log(
+          "_______________________________________________________________________________________"
+        );
       });
     });
     describe.skip("Accumulate Rewards", () => {
-      it("it should claim rewards for deposit into aave over 3 days ", async function ()
-      {
-        console.log('_______________________________________________________________________________________')
+      it("it should claim rewards for deposit into aave over 3 days ", async function () {
+        console.log(
+          "_______________________________________________________________________________________"
+        );
       });
     });
   });

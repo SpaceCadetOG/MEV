@@ -2,7 +2,7 @@ const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 const { expect } = require("chai");
 const { ethers, network, BigNumber } = require("hardhat");
 const BN = require("bn.js");
-const addresses = require("../../utils/addresses");
+const addresses = require("../../../utils/addresses");
 // USDC
 const DAI = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1";
 const USDC = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8";
@@ -224,10 +224,24 @@ describe("Using GMX using GMX Structs", function () {
 
         console.log(ethers.utils.formatUnits(profit, 12));
       });
+
+      it.only("swap()", async function () {
+        const { gmx, structs, weth, testChainlink, dai, usdc, user } = await loadFixture(
+          deployFixture
+        );
+        let balance
+        balance = await usdc.balanceOf(user.address)
+        console.log(ethers.utils.formatUnits(balance, 6))
+        await gmx.swapETHOnGMX(usdc.address, { value: ethers.utils.parseEther('1.0')})
+        // console.log(profit)
+        balance = await usdc.balanceOf(user.address)
+        console.log(ethers.utils.formatUnits(balance, 6))
+
+      });
     });
   });
 
-  describe.only("OPEN", () => {
+  describe.skip("OPEN", () => {
     it.only("Deposit To Vault", async function () {
       const { gmx, structs, weth, testChainlink, ethAmount, dai, whale } = await loadFixture(
         deployFixture

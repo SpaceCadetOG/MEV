@@ -19,11 +19,8 @@ contract AaveLendingV3 {
     address private aaveOracle =
         IPoolAddressesProvider(poolProvider).getPriceOracle();
     IAaveOracle oracle = IAaveOracle(aaveOracle);
-    address internal Owner;
 
-    constructor(address _Owner) {
-        Owner = _Owner;
-    }
+    constructor() {}
 
     function GetPriceOnAave(address asset) external view returns (uint256) {
         return oracle.getAssetPrice(asset);
@@ -91,7 +88,7 @@ contract AaveLendingV3 {
     }
 
     // Supply => https://docs.aave.com/developers/core-contracts/pool#supply
-    function Supply(address asset, uint256 amount) external {
+    function Supply(address asset,uint256 amount) external {
         IERC20(asset).transferFrom(msg.sender, address(this), amount);
         console.log(
             "Contract transfering amount of:",
@@ -99,113 +96,41 @@ contract AaveLendingV3 {
             "to contract"
         );
         IERC20(asset).approve(pool, amount);
+        console.log("approve aave");
         console.log("Depositing", amount / 1e18, "tokens to aave");
         IPool(pool).deposit(asset, amount, msg.sender, 0);
-        IPool(pool).setUserUseReserveAsCollateral(asset, true);
+        // IPool(pool).setUserUseReserveAsCollateral(asset, true);
         console.log("Deposit Complete!");
-    }
-
-    // Withdraw => https://docs.aave.com/developers/core-contracts/pool#withdraw
-    function Withdraw(address asset, uint256 amount) external {
-        console.log(
-            "Contract withdraw amount of:",
-            amount / 1e18,
-            "from contract"
-        );
-
-        IAToken(asset).approve(pool, amount);
-        IPool(pool).withdraw(asset, amount, msg.sender);
-
-        console.log("Withdraw Complete!");
     }
 
     // Borrow => https://docs.aave.com/developers/core-contracts/pool#borrow
     function Borrow(
         address asset,
-        address d_asset,
+         address d_asset,
         uint256 amount
     ) external {
+
+                // Use Oracle to DAI/ETH 
+                  // Borrow the safeMaxDAIBorrow amount from protocol(calculated in frontend)
+
+
         console.log(
             "Contract borrow amount of:",
             amount / 1e18,
             "from contract"
         );
         ICreditDelegationToken(d_asset).approveDelegation(msg.sender, amount);
-        // IERC20(asset).approve(pool, amount);
+                console.log(
+            "approve delegsation:",
+            amount / 1e18,
+            "from contract"
+        );
+        IERC20(asset).approve(pool, amount);
+      console.log("approve aave");
         IPool(pool).borrow(asset, amount, 1, 0, msg.sender);
-
         console.log("Borrow Complete!");
     }
-
-    function Repay(
-        address asset,
-        address d_asset,
-        uint256 amount
-    ) external {
-        console.log(
-            "Contract borrow amount of:",
-            amount / 1e18,
-            "from contract"
-        );
-        ICreditDelegationToken(d_asset).approveDelegation(msg.sender, amount);
-        // IERC20(asset).approve(pool, amount);
-        IPool(pool).repay(asset, amount, 1, msg.sender);
-        IPool(pool).repayWithATokens(asset, amount, 1);
-
-        console.log("Borrow Complete!");
-    }
-}
-
-// https://github.com/flashbots/mev-job-board/blob/main/specs/aave-liquidations.md
-contract AaveLiquidation {
-    // https://docs.aave.com/developers/core-contracts/pool#liquidationcall
-    address private poolProvider = 0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb;
-    IPoolAddressesProvider provider = IPoolAddressesProvider(poolProvider);
-    address private pool = IPoolAddressesProvider(poolProvider).getPool();
-    address private aaveOracle =
-        IPoolAddressesProvider(poolProvider).getPriceOracle();
-    IAaveOracle oracle = IAaveOracle(aaveOracle);
-    address internal Owner;
-
-    // getReservesList
-
-    constructor(address _Owner) {
-        Owner = _Owner;
-    }
-
-    function Liquidate(address asset, uint256 amount) external {
-        console.log(
-            "Contract liquidation collateral amount of:",
-            amount / 1e18,
-            "from contract"
-        );
-        (
-            address collateral, // can be any token
-            address debt, // can be any token
-            address user, // user to pay debt for
-            uint256 debtToCover, // amount to cover debt
-            bool receiveAToken // do you want to recieve reward in aToken
-        ) = (pool, asset, msg.sender, amount, true);
-        IERC20(asset).approve(pool, debtToCover);
-        IPool(pool).liquidationCall(
-            collateral,
-            debt,
-            user,
-            debtToCover,
-            receiveAToken
-        );
-
-        console.log("Liquidation Complete!");
-    }
-}
-
-contract AaveLeverage {
-    // Long
-    // Short
-}
-
-contract AaveFlashLoan {
-
+    
 }
 /**
 step 0 => get Wrapped or Check balance

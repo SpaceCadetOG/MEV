@@ -12,3 +12,6 @@ MEV Protection Exchange
 1. hh run --network local scripts/1_deploy.js
 2. hh run --network local scripts/2_interaction_exchange.js
 
+- *deploy ui* =>
+1. npm run start
+

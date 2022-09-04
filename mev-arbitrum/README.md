@@ -7,8 +7,8 @@
     - capital management []
     - Flashswap []
 2. Aave
-    - Supply []
-    - Borrow []
+    - Supply [x]
+    - Borrow [] *reverted with reason string '34'*
     - Repay []
     - Withdraw []
     - Flashloan [x]
@@ -17,7 +17,7 @@
     - Swap Tokens for Tokens [x]
     - Swap ETH for Tokens [x]
     - Swap Tokens for ETH [x]
-    - Leverage Trade [] *keep getting 'PositionRouter: invalid msg.value'*
+    - Leverage Trade [] *keep getting 'Router: plugin not approved'*
     - GLP []
     - Liquidate []
 4. Sushi

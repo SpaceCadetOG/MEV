@@ -208,10 +208,20 @@ contract PerpetuallySwapsETH1 is GMX_STRUCTS {
 
         path = new address[](2);
         path[0] = WETH;
-        path[1] = _tokenOut;
+        path[1] = _tokenOut; 
 
-        uint256 _amountOutMin = TokenAmountToUSDMinOnGMX(WETH, msg.value);
-        gmx.router.swapETHToTokens(path, _amountOutMin, msg.sender);
+
+        (uint256 _amountOutMin, ) = getAmountsOutOnGMX(
+            path[0],
+            path[1],
+            msg.value
+        );
+        
+        gmx.router.swapETHToTokens{value: msg.value}(
+            path,
+            _amountOutMin,
+            msg.sender
+        );
     }
 
     function OpenPositionGMX(
@@ -225,24 +235,31 @@ contract PerpetuallySwapsETH1 is GMX_STRUCTS {
         bytes32 _referralCode
     ) external payable {
         // console.log(position_router.minExecutionFee());
-        require(msg.value >= position_router.minExecutionFee(), 'need more to execute');
+        require(
+            msg.value >= position_router.minExecutionFee(),
+            "need more to execute"
+        );
         address[] memory path;
         path = new address[](2);
 
         IERC20(_path[0]).transferFrom(msg.sender, address(this), _amount);
         console.log("transferFrom");
         IERC20(_path[0]).approve(
-            0x3cd2F02B9e39ccC781d0C07fc0286F654e53A76D,
+            0xaBBc5F99639c9B6bCb58544ddf04EFA6802F4064,
             _amount
         );
-        console.log("approve gmx");
-        mc.router.approvePlugin(0x3cd2F02B9e39ccC781d0C07fc0286F654e53A76D);
-        console.log("approve plugin");
-        mc.router.directPoolDeposit(_path[0], _amount);
-        console.log("deposit gmx");
-        bytes32 key = position_router.getRequestKey(msg.sender, 1);
+        // console.log("approve gmx");
+        // gmx.router.directPoolDeposit(_path[0], _amount);
+        // console.log("deposit gmx");
+        bytes32 key = position_router.getRequestKey(address(this), 1);
         console.log("gmx key");
-        position_router.createIncreasePosition(
+
+        position_router.executeIncreasePosition(key, payable(address(this)));
+        console.log("executeIncreasePosition");
+
+        gmx.router.approvePlugin(0xE510571cAc76279DADf6c4b6eAcE5370F86e3dC2);
+        console.log("approve plugin");
+        position_router.createIncreasePosition{value: msg.value}(
             _path,
             _indexToken,
             _amount,
@@ -254,8 +271,6 @@ contract PerpetuallySwapsETH1 is GMX_STRUCTS {
             _referralCode
         );
         console.log("createIncreasePosition");
-        position_router.executeIncreasePosition(key, payable(msg.sender));
-        console.log("executeIncreasePosition");
 
         /**
  * 1. A user sends the request to increase / decrease a position to the PositionRouter
