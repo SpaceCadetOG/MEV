@@ -42,3 +42,7 @@ Nitro Update => Post 8-31-22 (https://github.com/NomicFoundation/hardhat/issues/
 6. hh test --network local test/aave/aave-v3-flashloan.test.js
 7. hh test --network local test/gmx/usingGMX.test.js 
 8. hh test --network local test/arbitum-nitro-plays/aave-v3-flashloan.test.js
+
+
+
+https://www.youtube.com/watch?v=z2aLKJ2kUjI

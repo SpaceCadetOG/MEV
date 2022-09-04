@@ -21,17 +21,17 @@ const FEE = 3000;
 // 0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8
 
 describe("UniswapV3TWAP Oracle", () => {
-  it(" WETH/USDC pool price on Uniswap  => 0.03%", async () => {
+  it.only(" WETH/USDC pool price on Uniswap  => 0.3%", async () => {
     const UniswapV3Twap = await ethers.getContractFactory("UniwapV3TWAP");
     const twap = await UniswapV3Twap.deploy(FACTORY, TOKEN_0, TOKEN_1, FEE);
     await twap.deployed();
 
-    const price = await twap.estimateAmountOut(TOKEN_1, 10n ** DECIMALS_1, 10);
+    const price = await twap.estimateAmountOut(TOKEN_1, 10n ** DECIMALS_1, FEE);
     console.table({
       USDC_WETH: ethers.utils.formatUnits(price.toString(), "wei") / 1000000,
     });
   });
-  it(" WETH/USDC pool price on Uniswap  => 1%", async () => {
+  it.only(" WETH/USDC pool price on Uniswap  => 1%", async () => {
     const UniswapV3Twap = await ethers.getContractFactory("UniwapV3TWAP");
     const twap = await UniswapV3Twap.deploy(FACTORY, TOKEN_0, TOKEN_1, 10000);
     await twap.deployed();
@@ -39,6 +39,61 @@ describe("UniswapV3TWAP Oracle", () => {
     const price = await twap.estimateAmountOut(TOKEN_1, 10n ** DECIMALS_1, 10);
     console.table({
       USDC_WETH: ethers.utils.formatUnits(price.toString(), "wei") / 1000000,
+    });
+  });
+  it.only(" WETH/USDC pool price on Uniswap  => 0.05%", async () => {
+    const UniswapV3Twap = await ethers.getContractFactory("UniwapV3TWAP");
+    const twap = await UniswapV3Twap.deploy(FACTORY, TOKEN_0, TOKEN_1, 500);
+    await twap.deployed();
+
+    const price = await twap.estimateAmountOut(TOKEN_1, 10n ** DECIMALS_1, 10);
+    console.table({
+      USDC_WETH: ethers.utils.formatUnits(price.toString(), "wei") / 1000000,
+    });
+  });
+  it.only(" ETH/DAI pool price on Uniswap => 0.3%", async () => {
+    const UniswapV3Twap = await ethers.getContractFactory("UniwapV3TWAP");
+    const twap = await UniswapV3Twap.deploy(
+      FACTORY,
+      "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+      TOKEN_1,
+      FEE
+    );
+    await twap.deployed();
+
+    const price = await twap.estimateAmountOut(TOKEN_1, 10n ** DECIMALS_1, FEE);
+    console.table({
+      DAI_WETH: ethers.utils.formatUnits(price.toString(), "wei") / 1e18,
+    });
+  });
+  it.only(" ETH/DAI pool price on Uniswap => 1%", async () => {
+    const UniswapV3Twap = await ethers.getContractFactory("UniwapV3TWAP");
+    const twap = await UniswapV3Twap.deploy(
+      FACTORY,
+      "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+      TOKEN_1,
+      10000
+    );
+    await twap.deployed();
+
+    const price = await twap.estimateAmountOut(TOKEN_1, 10n ** DECIMALS_1, 10000);
+    console.table({
+      DAI_WETH: ethers.utils.formatUnits(price.toString(), "wei") / 1e18,
+    });
+  });
+  it.only(" ETH/DAI pool price on Uniswap => 0.05%", async () => {
+    const UniswapV3Twap = await ethers.getContractFactory("UniwapV3TWAP");
+    const twap = await UniswapV3Twap.deploy(
+      FACTORY,
+      "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+      TOKEN_1,
+      500
+    );
+    await twap.deployed();
+
+    const price = await twap.estimateAmountOut(TOKEN_1, 10n ** DECIMALS_1, 500);
+    console.table({
+      DAI_WETH: ethers.utils.formatUnits(price.toString(), "wei") / 1e18,
     });
   });
   it(" GMX/USDC pool price on Uniswap  => 0.3%", async () => {
@@ -174,36 +229,6 @@ describe("UniswapV3TWAP Oracle", () => {
     );
     console.table({
       USDC_MIM: ethers.utils.formatUnits(price.toString(), "wei") / 1000000,
-    });
-  });
-  it(" ETH/DAI pool price on Uniswap => 0.3%", async () => {
-    const UniswapV3Twap = await ethers.getContractFactory("UniwapV3TWAP");
-    const twap = await UniswapV3Twap.deploy(
-      FACTORY,
-      "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
-      TOKEN_1,
-      FEE
-    );
-    await twap.deployed();
-
-    const price = await twap.estimateAmountOut(TOKEN_1, 10n ** DECIMALS_1, 10);
-    console.table({
-      DAI_WETH: ethers.utils.formatUnits(price.toString(), "wei") / 1e18,
-    });
-  });
-  it(" ETH/DAI pool price on Uniswap => 1%", async () => {
-    const UniswapV3Twap = await ethers.getContractFactory("UniwapV3TWAP");
-    const twap = await UniswapV3Twap.deploy(
-      FACTORY,
-      "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
-      TOKEN_1,
-      10000
-    );
-    await twap.deployed();
-
-    const price = await twap.estimateAmountOut(TOKEN_1, 10n ** DECIMALS_1, 10);
-    console.table({
-      DAI_WETH: ethers.utils.formatUnits(price.toString(), "wei") / 1e18,
     });
   });
   it(" GMX/DAI pool price on Uniswap => 0.3% ", async () => {
