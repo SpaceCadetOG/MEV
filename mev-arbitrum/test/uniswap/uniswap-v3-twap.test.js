@@ -155,7 +155,7 @@ describe("UniswapV3TWAP Oracle", () => {
       USDC_UNI: ethers.utils.formatUnits(price.toString(), "wei") / 1000000,
     });
   });
-  it(" DAI/USDC pool price on Uniswap  => 0.3%", async () => {
+  it.only(" DAI/USDC pool price on Uniswap  => 0.3%", async () => {
     const UniswapV3Twap = await ethers.getContractFactory("UniwapV3TWAP");
     const twap = await UniswapV3Twap.deploy(
       FACTORY,
@@ -174,7 +174,7 @@ describe("UniswapV3TWAP Oracle", () => {
       USDC_DAI: ethers.utils.formatUnits(price.toString(), "wei") / 1000000,
     });
   });
-  it(" DAI/USDC pool price on Uniswap  => 1%", async () => {
+  it.only(" DAI/USDC pool price on Uniswap  => 1%", async () => {
     const UniswapV3Twap = await ethers.getContractFactory("UniwapV3TWAP");
     const twap = await UniswapV3Twap.deploy(
       FACTORY,

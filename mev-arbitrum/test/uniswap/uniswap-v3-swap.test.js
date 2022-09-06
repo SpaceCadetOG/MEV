@@ -99,7 +99,7 @@ describe("UniswapV3 SWAP", () => {
     const { twap, owner, ethAmount, dai , testChainlink, weth } = await loadFixture(deployFixture);
     
     amount = 10n ** 18n
-    daiAmount = 10n * 10n ** 18n; // 1 eth
+    daiAmount = 1549n * 10n ** 18n; // 1 eth
     price = await testChainlink.getLatestPriceETH()
     await twap.swapExactOutputSingle(weth.address, dai.address, daiAmount, amount)
     console.log(ethers.utils.formatEther(await dai.balanceOf(owner.address)))

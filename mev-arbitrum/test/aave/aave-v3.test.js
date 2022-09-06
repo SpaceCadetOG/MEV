@@ -12,14 +12,12 @@ const aDAI = "0x82E64f49Ed5EC1bC6e43DAD4FC8Af9bb3A2312EE";
 const debt_USDC = "0xFCCf3cAbbe80101232d343252614b6A3eE81C989";
 const DAI_WHALE = "0xBA479d5585EcEC47eDc2a571dA430A40f43c3851"; // find whale on etherscan => Look for exchanges like FTX || Binacne || Coinbase
 const address_provider = "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5";
-
+const me = '0xE5e96c7AA9De0451DBE29ACDBFD7632F0963f121'
 describe("Aave", function () {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshopt in every test.
   async function deployFixture() {
-    const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-    const unlockTime = (await time.latest()) + ONE_YEAR_IN_SECS;
 
     // Contracts are deployed using the first signer/account by default
     const owner = await ethers.getSigner();
@@ -56,10 +54,14 @@ describe("Aave", function () {
       method: "hardhat_impersonateAccount",
       params: [DAI_WHALE],
     });
+    await network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [me],
+    });
     whale = await ethers.getSigner(DAI_WHALE);
 
-    fundAmount = 20000n * 10n ** 18n; // 20000 dai
-    borrowAmount = 20000n * 10n ** 18n; // 10000 dai
+    fundAmount = 2000n * 10n ** 18n; // 20000 dai
+    borrowAmount = 200n * 10n ** 18n; // 10000 dai
     fee = 10n * 10n ** 18n; // 10000 dai
 
     console.log(`Balance Of user Dai: ${user_balance}`);
@@ -99,7 +101,6 @@ describe("Aave", function () {
     );
     return {
       lending,
-      unlockTime,
       owner,
       dai,
       a_dai,
@@ -231,6 +232,49 @@ describe("Aave", function () {
       });
     });
     describe.only("Deposit", () => {
+      it("it should deposit ETH into aave borrow 100 dai", async function () {
+        const {
+          lending,
+          owner,
+          dai,
+          fundAmount,
+          a_dai,
+          borrowAmount,
+          debt_usdc,
+        } = await loadFixture(deployFixture);
+
+        reserve = await lending.UserAccountData(owner.address);
+
+        console.table({
+          TotalCollateralValue: ethers.utils.formatUnits(reserve[0], 8),
+          TotalAmountBorrowed: ethers.utils.formatUnits(reserve[1], 8),
+          TotalAmountAvalibleToBorrow: ethers.utils.formatUnits(reserve[2], 8),
+          currentLiquidationThreshold: ethers.utils.formatUnits(reserve[3], 2),
+          MaxLoanToValue: ethers.utils.formatUnits(reserve[4], 2),
+          HealthFactor: ethers.utils.formatUnits(reserve[5], 18),
+        });
+
+        let bDai_balance = ethers.utils.formatUnits(
+          await dai.balanceOf(owner.address),
+          18
+        );
+        console.log(`Before balance Of Dai: ${bDai_balance}`);
+        amount = 100n * 10n ** 18n;
+        await lending.DepositETH({ value: ethers.utils.parseEther("1") });
+
+        reserve = await lending.UserAccountData(owner.address);
+
+        console.table({
+          TotalCollateralValue: ethers.utils.formatUnits(reserve[0], 8),
+          TotalAmountBorrowed: ethers.utils.formatUnits(reserve[1], 8),
+          TotalAmountAvalibleToBorrow: ethers.utils.formatUnits(reserve[2], 8),
+          currentLiquidationThreshold: ethers.utils.formatUnits(reserve[3], 2),
+          MaxLoanToValue: ethers.utils.formatUnits(reserve[4], 2),
+          HealthFactor: ethers.utils.formatUnits(reserve[5], 8),
+        });
+
+        await lending.Borrow(dai.address, amount);
+      });
       it("it should deposit Dai into aave", async function () {
         const {
           lending,
@@ -242,6 +286,17 @@ describe("Aave", function () {
           debt_usdc,
         } = await loadFixture(deployFixture);
 
+        reserve = await lending.UserAccountData(owner.address);
+
+        console.table({
+          TotalCollateralValue: ethers.utils.formatUnits(reserve[0], 8),
+          TotalAmountBorrowed: ethers.utils.formatUnits(reserve[1], 8),
+          TotalAmountAvalibleToBorrow: ethers.utils.formatUnits(reserve[2], 8),
+          currentLiquidationThreshold: ethers.utils.formatUnits(reserve[3], 2),
+          MaxLoanToValue: ethers.utils.formatUnits(reserve[4], 2),
+          HealthFactor: ethers.utils.formatUnits(reserve[5], 18),
+        });
+
         let bDai_balance = ethers.utils.formatUnits(
           await dai.balanceOf(owner.address),
           18
@@ -250,9 +305,20 @@ describe("Aave", function () {
 
         await lending.Supply(dai.address, fundAmount);
 
-        expect(await a_dai.balanceOf(owner.address)).lessThanOrEqual(
-          fundAmount
-        );
+        // expect(await a_dai.balanceOf(owner.address)).lessThanOrEqual(
+        //   fundAmount
+        // );
+
+        reserve = await lending.UserAccountData(owner.address);
+
+        console.table({
+          TotalCollateralValue: ethers.utils.formatUnits(reserve[0], 8),
+          TotalAmountBorrowed: ethers.utils.formatUnits(reserve[1], 8),
+          TotalAmountAvalibleToBorrow: ethers.utils.formatUnits(reserve[2], 8),
+          currentLiquidationThreshold: ethers.utils.formatUnits(reserve[3], 2),
+          MaxLoanToValue: ethers.utils.formatUnits(reserve[4], 2),
+          HealthFactor: ethers.utils.formatUnits(reserve[5], 18),
+        });
       });
     });
 
@@ -281,12 +347,26 @@ describe("Aave", function () {
       );
     });
 
-    describe.only("Borrow", () => {
+    describe("Borrow", () => {
       it("it should borrow into aave", async function () {
-        const { lending, owner, dai, borrowAmount, a_dai, debt_usdc } =
-          await loadFixture(deployFixture);
-        amount = 10n * 10n ** 6n;
-        await lending.Borrow(USDC, debt_USDC, amount);
+        const {
+          lending,
+          owner,
+          dai,
+          borrowAmount,
+          a_dai,
+          debt_usdc,
+          fundAmount,
+        } = await loadFixture(deployFixture);
+        amount = 200n * 10n ** 18n;
+
+        await lending.Supply(dai.address, fundAmount);
+
+        // expect(await a_dai.balanceOf(owner.address)).lessThanOrEqual(
+        //   fundAmount
+        // );
+
+        await lending.Borrow(dai.address, debt_USDC, amount);
 
         // await lending.BorrowV2(USDC, borrowAmount);
       });

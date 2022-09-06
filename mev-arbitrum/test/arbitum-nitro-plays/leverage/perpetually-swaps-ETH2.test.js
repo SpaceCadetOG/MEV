@@ -80,7 +80,7 @@ describe("Aave", function () {
     );
 
     const Lending = await ethers.getContractFactory("AaveLendingV3");
-    const lending = await Lending.deploy(owner.address);
+    const lending = await Lending.deploy();
     lending.deployed();
 
     const Loan = await ethers.getContractFactory("PerpetuallySwapsETH2");

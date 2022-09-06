@@ -63,6 +63,7 @@ contract PerpetuallySwapsETH2 is FlashLoanSimpleReceiverBase {
             "Invalid Balance for the contract"
         );
         console.log("AmountBorrowed", amount);
+        console.log("flashloan fee: ", premium);
         /*
         Steps using uniswap funcs => (Assuming we borrow WETH) 
 
@@ -83,6 +84,7 @@ contract PerpetuallySwapsETH2 is FlashLoanSimpleReceiverBase {
             IERC20(asset).balanceOf(address(this)) >= amountToPayback,
             "Insufficent funds to payback loan"
         );
+
         console.log("amount + flashloan fee: ", amountToPayback);
         emit LoanFinished(asset, amountToPayback);
 

@@ -241,7 +241,7 @@ describe("Using GMX using GMX Structs", function () {
     });
   });
 
-  describe.skip("OPEN", () => {
+  describe.only("OPEN", () => {
     it.only("Deposit To Vault", async function () {
       const { gmx, structs, weth, testChainlink, ethAmount, dai, whale } = await loadFixture(
         deployFixture

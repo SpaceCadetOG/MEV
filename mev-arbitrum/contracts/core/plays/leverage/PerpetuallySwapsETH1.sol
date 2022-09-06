@@ -208,15 +208,14 @@ contract PerpetuallySwapsETH1 is GMX_STRUCTS {
 
         path = new address[](2);
         path[0] = WETH;
-        path[1] = _tokenOut; 
-
+        path[1] = _tokenOut;
 
         (uint256 _amountOutMin, ) = getAmountsOutOnGMX(
             path[0],
             path[1],
             msg.value
         );
-        
+
         gmx.router.swapETHToTokens{value: msg.value}(
             path,
             _amountOutMin,
@@ -236,9 +235,11 @@ contract PerpetuallySwapsETH1 is GMX_STRUCTS {
     ) external payable {
         // console.log(position_router.minExecutionFee());
         require(
-            msg.value >= position_router.minExecutionFee(),
+            _executionFee >= position_router.minExecutionFee(),
             "need more to execute"
         );
+        require(_executionFee == msg.value, "executionFee not set");
+
         address[] memory path;
         path = new address[](2);
 
@@ -248,9 +249,9 @@ contract PerpetuallySwapsETH1 is GMX_STRUCTS {
             0xaBBc5F99639c9B6bCb58544ddf04EFA6802F4064,
             _amount
         );
-        // console.log("approve gmx");
-        // gmx.router.directPoolDeposit(_path[0], _amount);
-        // console.log("deposit gmx");
+        console.log("approve gmx");
+        gmx.router.directPoolDeposit(_path[0], _amount);
+        console.log("deposit gmx");
         bytes32 key = position_router.getRequestKey(address(this), 1);
         console.log("gmx key");
 
@@ -259,7 +260,8 @@ contract PerpetuallySwapsETH1 is GMX_STRUCTS {
 
         gmx.router.approvePlugin(0xE510571cAc76279DADf6c4b6eAcE5370F86e3dC2);
         console.log("approve plugin");
-        position_router.createIncreasePosition{value: msg.value}(
+
+        position_router.createIncreasePosition{value: _executionFee}(
             _path,
             _indexToken,
             _amount,
@@ -267,7 +269,7 @@ contract PerpetuallySwapsETH1 is GMX_STRUCTS {
             _sizeDelta,
             true,
             _acceptablePrice,
-            msg.value,
+            position_router.minExecutionFee(),
             _referralCode
         );
         console.log("createIncreasePosition");

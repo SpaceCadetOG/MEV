@@ -11,6 +11,7 @@ import {DataTypes} from "@aave/core-v3/contracts/protocol/libraries/types/DataTy
 import "hardhat/console.sol";
 import {IAaveOracle} from "@aave/core-v3/contracts/interfaces/IAaveOracle.sol";
 import {ICreditDelegationToken} from "@aave/core-v3/contracts/interfaces/ICreditDelegationToken.sol";
+import {IWETHGateway} from "@aave/periphery-v3/contracts/misc/interfaces/IWETHGateway.sol";
 
 contract AaveLendingV3 {
     address private poolProvider = 0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb;
@@ -19,7 +20,8 @@ contract AaveLendingV3 {
     address private aaveOracle =
         IPoolAddressesProvider(poolProvider).getPriceOracle();
     IAaveOracle oracle = IAaveOracle(aaveOracle);
-
+    IWETHGateway wethGateway =
+        IWETHGateway(0xC09e69E79106861dF5d289dA88349f10e2dc6b5C);
     constructor() {}
 
     function GetPriceOnAave(address asset) external view returns (uint256) {
@@ -88,7 +90,7 @@ contract AaveLendingV3 {
     }
 
     // Supply => https://docs.aave.com/developers/core-contracts/pool#supply
-    function Supply(address asset,uint256 amount) external {
+    function Supply(address asset, uint256 amount) external {
         IERC20(asset).transferFrom(msg.sender, address(this), amount);
         console.log(
             "Contract transfering amount of:",
@@ -103,34 +105,53 @@ contract AaveLendingV3 {
         console.log("Deposit Complete!");
     }
 
+    function DepositETH() external payable {
+        uint16 rc = 0;
+        uint256 rate = 2;
+        address onBehalfOf = msg.sender;
+
+        wethGateway.depositETH{value: msg.value}(pool, onBehalfOf, rc);
+        
+        console.log("Deposit eth");
+
+        (
+            uint totalCollateralBase,
+            ,
+            uint256 availableBorrowsBase,
+            ,
+            ,
+
+        ) = IPool(pool).getUserAccountData(msg.sender);
+        // return (
+        //     totalCollateralBase,
+        //     totalDebtBase,
+        //     availableBorrowsBase,
+        //     currentLiquidationThreshold,
+        //     ltv,
+        //     healthFactor
+        // );
+
+    }
     // Borrow => https://docs.aave.com/developers/core-contracts/pool#borrow
     function Borrow(
         address asset,
-         address d_asset,
         uint256 amount
     ) external {
-
-                // Use Oracle to DAI/ETH 
-                  // Borrow the safeMaxDAIBorrow amount from protocol(calculated in frontend)
-
+        // Use Oracle to DAI/ETH
+        // Borrow the safeMaxDAIBorrow amount from protocol(calculated in frontend)
 
         console.log(
             "Contract borrow amount of:",
             amount / 1e18,
             "from contract"
         );
-        ICreditDelegationToken(d_asset).approveDelegation(msg.sender, amount);
-                console.log(
-            "approve delegsation:",
-            amount / 1e18,
-            "from contract"
-        );
-        IERC20(asset).approve(pool, amount);
-      console.log("approve aave");
+        // ICreditDelegationToken(d_asset).approveDelegation(address(this), amount);
+        // console.log("approve delegsation:", amount / 1e18, "from contract");
+        // IERC20(asset).approve(pool, amount);
+        // console.log("approve aave");
         IPool(pool).borrow(asset, amount, 1, 0, msg.sender);
         console.log("Borrow Complete!");
     }
-    
 }
 /**
 step 0 => get Wrapped or Check balance
