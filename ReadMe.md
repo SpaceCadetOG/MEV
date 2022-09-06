@@ -1,6 +1,6 @@
 # MEV Research Post-Merge Repo
 
-_This repo is all apart of my blockchain research for post merge. W/ Proof of Stake consensus model and how L2s like Arbtrium can solve it. This repo will be updated through out the the 1 year post merge. We will be using arbtrium, avalanche, zksync, starknet to evaluate ethereum's performance. This isn't to see which is the best blockchain. The Research will be able transferable across EVM-Based chains_
+_This repo is all apart of my blockchain research for post merge. Ethereum will be used as a constant  compared W/ other Proof of Stake consensus models and how L2s like Arbtrium can help alivate. This repo will be updated through out the the 1 year post merge. We will be using arbtrium, zksync, starknet to evaluate ethereum's performance. I will also create strigies and compare them on all chains. We will test {Profits, Networks Latency, Solidity Coding Updates, amount of transactions based on money made}. This research is not intended to see which blockchain best. The Research will be transferable across EVM-Based chains. Findings on one chain will have some sort of relations to another one._
 
 ## Research Goals
 1. Post-Merge 
