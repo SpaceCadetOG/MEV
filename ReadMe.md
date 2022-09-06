@@ -12,7 +12,7 @@ _This repo is all apart of my blockchain research for post merge. Ethereum will 
     - *Relationships w/ Validator*
         - The increased # of them over 1 year since merge
             - Tier based on activity and particpation
-        - ETH burned post EIP-1559, how that incentives vaildators post-merge.
+        - ETH burned post EIP-1559, how that incentives the vaildator economics post-merge.
         -   Will it cause inflation? Will it dilute the system?
 
     - *Unstaking Period starts*
@@ -39,9 +39,10 @@ _This repo is all apart of my blockchain research for post merge. Ethereum will 
     1. Why All protocols should create their own oracles based on liquity on platform
     2. Use Chainlink as a Fallback
 - Oracle Manplation and Front-running
+- Create TWAP oracle
 
 3. MEV on L2
-    - Arbtrum Has a 4 block delay than Ethereum. How can that be exploited?
+    - Arbtrum Has a mid state than Ethereum. How can that be exploited?
     - Who winning the race after 1 year
         - based on tech, user transactions, tvl
 
@@ -49,3 +50,4 @@ _This repo is all apart of my blockchain research for post merge. Ethereum will 
     - If so that may require some fee.
     - Does that help or hurt the ecosystem?
 
+5. 1Inch and Paraswap vs ME

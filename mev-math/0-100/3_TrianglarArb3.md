@@ -61,4 +61,4 @@ Considerations
 
 [Watch this video to reinforce](https://www.youtube.com/watch?v=kdua-L7yZkw)
 
-
+[read this to reinforce](https://blog.coinbase.com/quantitative-crypto-insight-an-analysis-of-triangular-arbitrage-transactions-in-uniswap-v2-1b572284bfa8)
