@@ -1,24 +1,19 @@
-//SPDX-License-Identifier: MIT
-
-pragma solidity 0.8.0;
+//SPDX-License-Identifier: BlockchainBic
+pragma solidity ^0.7.6;
+pragma abicoder v2;
 
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/IQuoter.sol";
 import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
+import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
+import "@uniswap/v3-periphery/contracts/libraries/OracleLibrary.sol";
+import "hardhat/console.sol";
 
-// https://docs.uniswap.org/protocol/guides/swaps/single-swaps
+
 contract tradingTriangles {
-    // 1) swap eth for weth
-
-    // 2) swap eth for usdc
-
-    // 3) swap eth for wbtc
-
-    // This example swaps DAI/WETH9 for single path swaps and DAI/USDC/WETH9 for multi path swaps.
     address public constant DAI = 0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1;
     address public constant WETH = 0x82aF49447D8a07e3bd95BD0d56f35241523fBab1;
     address public constant USDC = 0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8;
-
     uint24 public constant poolFee1 = 3000;
     uint24 public constant poolFee2 = 10000;
     uint24 public constant poolFee3 = 500;
@@ -27,37 +22,79 @@ contract tradingTriangles {
         ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
     IQuoter public constant quoter =
         IQuoter(0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6);
+    address factory = 0x1F98431c8aD98523631AE4a59f267346ea31F984;
 
-    function quoteETHtoDAI(uint256 amountIn, uint24 fee)
-        external
-        payable
-        returns (uint256)
-    {
-        return (quoter.quoteExactInputSingle(WETH, DAI, fee, amountIn, 0));
+    // TWAP
+
+    function estimateAmountOut(
+        address token0,
+        address token1,
+        uint24 fee,
+        address tokenIn,
+        uint128 amountIn,
+        uint32 secondAgo
+    ) public view returns (uint256 amountOut) {
+        token0 = tokenIn;
+        require(tokenIn == token0 || tokenIn == token1, "invalid token");
+        address tokenOut = tokenIn == token0 ? token1 : token0;
+
+        address pool = IUniswapV3Factory(factory).getPool(token0, token1, fee);
+        require(pool != address(0), "pool doesn't exist");
+
+        (int24 tick, ) = OracleLibrary.consult(pool, secondAgo);
+
+        amountOut = OracleLibrary.getQuoteAtTick(
+            tick,
+            amountIn,
+            tokenIn,
+            tokenOut
+        );
     }
 
-    function quoteDAItoETH(uint256 amountOut, uint24 fee)
-        public
-        payable
-        returns (uint256)
-    {
-        return (quoter.quoteExactOutputSingle(WETH, DAI, fee, amountOut, 0));
+
+    function estimateTrade(
+        address token0,
+        address token1,
+        uint24 fee,
+        uint128 amountIn,
+        uint32 secondAgo
+    ) external view returns (uint256) {
+        uint256 trade1 = estimateAmountOut(
+            token0,
+            token1,
+            fee,
+            token0,
+            amountIn,
+            secondAgo
+        );
+        return (trade1);
     }
 
-    function quoteUSDCtoETH(uint256 amountIn)
-        external
-        payable
-        returns (uint256)
-    {
-        return (quoter.quoteExactOutputSingle(WETH, USDC, 500, amountIn, 0));
-    }
+    function estimate2Trade(
+        address token0,
+        address token1,
+        uint24 fee,
+        uint128 amountIn,
+        uint32 secondAgo
+    ) external view returns (uint256, uint256) {
+        uint256 trade1 = estimateAmountOut(
+            token0,
+            token1,
+            fee,
+            token0,
+            amountIn,
+            secondAgo
+        );
 
-    function quoteETHtoUSDC(uint256 amountIn)
-        external
-        payable
-        returns (uint256)
-    {
-        return (quoter.quoteExactInputSingle(WETH, USDC, 500, amountIn, 0));
+         uint256 trade2 = estimateAmountOut(
+            token1,
+            token0,
+            500,
+            token1,
+            uint24(trade1),
+            secondAgo
+        );
+        return (trade1, trade2);
     }
 
     function swapExactInputSingle(
@@ -98,8 +135,8 @@ contract tradingTriangles {
     function swapExactOutputSingle(
         uint24 fee,
         address tokenIn,
-        uint256 amountOut,
         address tokenOut,
+        uint256 amountOut,
         uint256 amountInMaximum
     ) external returns (uint256 amountIn) {
         // Transfer the specified amount of DAI to this contract.
@@ -109,10 +146,7 @@ contract tradingTriangles {
             address(this),
             amountInMaximum
         );
-
-        // Approve the router to spend the specified `amountInMaximum` of DAI.
-        // In production, you should choose the maximum amount to spend based on oracles or other data sources to achieve a better swap.
-        TransferHelper.safeApprove(WETH, address(swapRouter), amountInMaximum);
+        TransferHelper.safeApprove(tokenIn, address(swapRouter), amountInMaximum);
 
         ISwapRouter.ExactOutputSingleParams memory params = ISwapRouter
             .ExactOutputSingleParams({
@@ -132,7 +166,7 @@ contract tradingTriangles {
         // For exact output swaps, the amountInMaximum may not have all been spent.
         // If the actual amount spent (amountIn) is less than the specified maximum amount, we must refund the msg.sender and approve the swapRouter to spend 0.
         if (amountIn < amountInMaximum) {
-            TransferHelper.safeApprove(WETH, address(swapRouter), 0);
+            TransferHelper.safeApprove(tokenIn, address(swapRouter), 0);
             TransferHelper.safeTransfer(
                 tokenIn,
                 msg.sender,
@@ -169,6 +203,37 @@ contract tradingTriangles {
         amountOut = swapRouter.exactInput(params);
     }
 
+    function quoteETHtoDAI(uint256 amountIn, uint24 fee)
+        external
+        payable
+        returns (uint256)
+    {
+        return (quoter.quoteExactInputSingle(WETH, DAI, fee, amountIn, 0));
+    }
+
+    function quoteDAItoETH(uint256 amountOut, uint24 fee)
+        public
+        payable
+        returns (uint256)
+    {
+        return (quoter.quoteExactOutputSingle(WETH, DAI, fee, amountOut, 0));
+    }
+
+    function quoteUSDCtoETH(uint256 amountIn)
+        external
+        payable
+        returns (uint256)
+    {
+        return (quoter.quoteExactOutputSingle(WETH, USDC, 500, amountIn, 0));
+    }
+
+    function quoteETHtoUSDC(uint256 amountIn)
+        external
+        payable
+        returns (uint256)
+    {
+        return (quoter.quoteExactInputSingle(WETH, USDC, 500, amountIn, 0));
+    }
     // get token pairs
     // get pool reserves
     // use twap

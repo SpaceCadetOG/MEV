@@ -1,53 +1,65 @@
-# MEV Research Post-Merge Repo
+# OEV => Oracle Extracted Value
 
-_This repo is all apart of my blockchain research for post merge. Ethereum will be used as a constant  compared W/ other Proof of Stake consensus models and how L2s like Arbtrium can help alivate. This repo will be updated through out the the 1 year post merge. We will be using arbtrium, zksync, starknet to evaluate ethereum's performance. I will also create strigies and compare them on all chains. We will test {Profits, Networks Latency, Solidity Coding Updates, amount of transactions based on money made}. This research is not intended to see which blockchain best. The Research will be transferable across EVM-Based chains. Findings on one chain will have some sort of relations to another one._
+_With ETH 2.0 moving to Proof of Stake, MEV will have some changes. On way of extracting value which can be from oracles. In this repo i will be creating research how to capture mev using oracles. Also noticed chainlink has a stronghold on the ecosystem. Could that potential be a weak point. How can value be capture and how could we mitigate single point of failure. Should all protocols create proprietary oracle while using chainlink as a fallback?_
+
+[refer to this article](https://medium.com/@nfett/on-oracle-extractable-value-f6c7a0d64af5)
 
 ## Research Goals
 1. Post-Merge 
     - *Capture Arbs using FIFO model*
-        - Local Node Set Up vs Using Third Party
-            - Is my local block faster than connecting
+        - Local Node Set Up vs Using Third Party Node
+            - Latency Test
             - cost of doing it and scaling
+        - Gas-Optimize -> Yul and Assembly
 
-    - *Relationships w/ Validator*
-        - The increased # of them over 1 year since merge
+ ##   *Relationships w/ Validator*
+        - Track the increasing # of validators over 1 year
             - Tier based on activity and particpation
-        - ETH burned post EIP-1559, how that incentives the vaildator economics post-merge.
-        -   Will it cause inflation? Will it dilute the system?
+        - ETH burned post EIP-1559, how does that incentives vaildator economics post-merge?
+        -   When unstaking starts, will it cause network traffic? Will it dilute the system?
+        - Will the network hold up with more transactions coming
+        - Could developing a relationship w/ Validator help w/ long-tail?
+            - Minimize broadcasting plays?
 
-    - *Unstaking Period starts*
-        - Will the network hold up with more transactions
-
-    - *Does MEV make the network expensive to use*
-        - If so how can you work around it 
-        - Changes to propose in EIPs
-
-    - *Maximize profits*
-        - Time
+## *Maximize profits*
+        - Time -> Oracle
             - Time of Day Most profit per trade
             - Time of Day trade happen most
             - Best time To trade
+        - Reflexivity Playbook
+            - Scale w/ the network
+            - Boom / Bust -> React to what is onchain 
 
-        - MEV Playbook
-            - Short-tail
-            - Long-Tail
-            - Amount of Hops
+  ## *Getting Prices from OnChain Liquidity VS Chainlink Oracle*
 
-2. [OEV => Oracle Extracted Value](https://medium.com/@nfett/on-oracle-extractable-value-f6c7a0d64af5)
-  - *Getting Prices from OnChain Liquidity VS Chainlink Oracle*
-  - *Can Chainlink Break All blockchains? Single Point of failure.*
-    1. Why All protocols should create their own oracles based on liquity on platform
+  ##  *Can Chainlink Break All blockchains? Is It a Single Point of failure?*
+    1. Why All protocols should create their own oracles based on liquidty on platform
     2. Use Chainlink as a Fallback
-- Oracle Manplation and Front-running
-- Create TWAP oracle
 
-3. MEV on L2
-    - Arbtrum Has a mid state than Ethereum. How can that be exploited?
+## Oracle Manplation and Front-running
+    - If chainlink doesnt update?
+
+## TWAP oracle
+    - Constant Product vs Constant Product
+
+## MEV on L2
+    - Deep Dive into the Tech
+        - When L1 is Congested?
+            - Does L2 slow down too?
+        - L2 Sequencers
+            - Where can we find value 
     - Who winning the race after 1 year
-        - based on tech, user transactions, tvl
+        - [based on tech, user transactions, tvl]
 
-4. Will Protocols start to adopting MEV protection? 
+## Will Protocols start to adopting MEV protection? 
     - If so that may require some fee.
     - Does that help or hurt the ecosystem?
 
-5. 1Inch and Paraswap vs ME
+## 1Inch and Paraswap vs ME
+    - Who saves more money
+    - Who has faster trades
+
+    *This is for serious defi trader not for degen*
+
+
+[triangular arbitrage analysis article](https://blog.coinbase.com/quantitative-crypto-insight-an-analysis-of-triangular-arbitrage-transactions-in-uniswap-v2-1b572284bfa8)
