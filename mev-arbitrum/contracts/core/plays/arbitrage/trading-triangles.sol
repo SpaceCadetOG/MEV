@@ -25,7 +25,6 @@ contract tradingTriangles {
     address factory = 0x1F98431c8aD98523631AE4a59f267346ea31F984;
 
     // TWAP
-
     function estimateAmountOut(
         address token0,
         address token1,
@@ -51,7 +50,6 @@ contract tradingTriangles {
         );
     }
 
-
     function estimateTrade(
         address token0,
         address token1,
@@ -59,6 +57,7 @@ contract tradingTriangles {
         uint128 amountIn,
         uint32 secondAgo
     ) external view returns (uint256) {
+
         uint256 trade1 = estimateAmountOut(
             token0,
             token1,
@@ -67,6 +66,7 @@ contract tradingTriangles {
             amountIn,
             secondAgo
         );
+        
         return (trade1);
     }
 

@@ -24,12 +24,6 @@
     - Swap []
     - CrossChain-Swap []
 
-5. Sperax
-
-6. Paraswap
-    - Swap []
-    - CrossChain-Swap []
-
 
 
 Nitro Update => Post 8-31-22 (https://github.com/NomicFoundation/hardhat/issues/2995)
