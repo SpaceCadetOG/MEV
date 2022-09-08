@@ -23,9 +23,8 @@ _With ETH 2.0 moving to Proof of Stake, MEV will have some changes. On way of ex
 
 ## *Maximize profits*
         - Time -> Oracle
-            - Time of Day Most profit per trade
-            - Time of Day trade happen most
-            - Best time To trade
+            - Least Network Traffic
+            - Searchers that slow down
         - Reflexivity Playbook
             - Scale w/ the network
             - Boom / Bust -> React to what is onchain 
@@ -35,6 +34,8 @@ _With ETH 2.0 moving to Proof of Stake, MEV will have some changes. On way of ex
   ##  *Can Chainlink Break All blockchains? Is It a Single Point of failure?*
     1. Why All protocols should create their own oracles based on liquidty on platform
     2. Use Chainlink as a Fallback
+    3. Bridge Hacks...most were using chainlink oracles.
+    4. Validators and Oracle (node operations) will one
 
 ## Oracle Manplation and Front-running
     - If chainlink doesnt update?
@@ -59,7 +60,13 @@ _With ETH 2.0 moving to Proof of Stake, MEV will have some changes. On way of ex
     - Who saves more money
     - Who has faster trades
 
-    *This is for serious defi trader not for degen*
+    *This is for serious defi trader...like olympics training*
 
 
 [triangular arbitrage analysis article](https://blog.coinbase.com/quantitative-crypto-insight-an-analysis-of-triangular-arbitrage-transactions-in-uniswap-v2-1b572284bfa8)
+
+[TWAP ATTACK](https://eprint.iacr.org/2022/445.pdf)
+
+[Yes I Believe the hype](https://www.youtube.com/watch?v=RPeI3dC0uPc)
+
+[Good Read](https://pure.tudelft.nl/ws/portalfiles/portal/104736534/3474374.3486916.pdf)
