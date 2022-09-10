@@ -677,7 +677,7 @@ describe("Trading Triangles Test", () => {
       );
     });
 
-    it.only(" eth => usdc => swapExactOutputSingle", async () => {
+    it.only("  usdc => eth => gmx => usdc swapExactOutputSingle", async () => {
       const {
         twap,
         owner,
@@ -716,7 +716,7 @@ describe("Trading Triangles Test", () => {
         ethers.utils.formatUnits(await weth.balanceOf(owner.address), 18)
       );
 
-      await twap.swapExactInputSingle(10000, weth.address, ethAmount, GMX);
+      await twap.swapExactInputSingle(3000, weth.address, ethAmount, GMX);
 
       console.log(
         "M: GMX",
@@ -730,7 +730,7 @@ describe("Trading Triangles Test", () => {
         .connect(owner)
         .approve(twap.address, await gmx.balanceOf(owner.address));
       await twap.swapExactInputSingle(
-        10000,
+        3000,
         gmx.address,
         await gmx.balanceOf(owner.address),
         usdc.address
@@ -746,5 +746,77 @@ describe("Trading Triangles Test", () => {
         ethers.utils.formatUnits(await usdc.balanceOf(owner.address), 6)
       );
     });
+
+    it.only("  usdc => eth => gmx => usdc swapExactOutputSingle", async () => {
+      const {
+        twap,
+        owner,
+        ethAmount,
+        dai,
+        usdc,
+        testChainlink,
+        weth,
+        usdcAmount,
+        gmx,
+      } = await loadFixture(deployFixture);
+
+      console.log(
+        "B: USDC",
+        ethers.utils.formatUnits(await usdc.balanceOf(owner.address), 6)
+      );
+      console.log(
+        "B: WETH",
+        ethers.utils.formatUnits(await weth.balanceOf(owner.address), 18)
+      );
+
+      await twap.swapExactOutputSingle(
+        500,
+        usdc.address,
+        weth.address,
+        ethAmount,
+        usdcAmount
+      );
+
+      console.log(
+        "M: USDC",
+        ethers.utils.formatUnits(await usdc.balanceOf(owner.address), 6)
+      );
+      console.log(
+        "M: WETH",
+        ethers.utils.formatUnits(await weth.balanceOf(owner.address), 18)
+      );
+
+      await twap.swapExactInputSingle(3000, weth.address, ethAmount, GMX);
+
+      console.log(
+        "M: GMX",
+        ethers.utils.formatUnits(await gmx.balanceOf(owner.address), 18)
+      );
+      console.log(
+        "M: WETH",
+        ethers.utils.formatUnits(await weth.balanceOf(owner.address), 18)
+      );
+      await gmx
+        .connect(owner)
+        .approve(twap.address, await gmx.balanceOf(owner.address));
+      await twap.swapExactInputSingle(
+        3000,
+        gmx.address,
+        await gmx.balanceOf(owner.address),
+        usdc.address
+      );
+
+      console.log(
+        "A: GMX",
+        ethers.utils.formatUnits(await usdc.balanceOf(owner.address), 18)
+      );
+
+      console.log(
+        "A: USDC",
+        ethers.utils.formatUnits(await usdc.balanceOf(owner.address), 6)
+      );
+    });
+
+    
   });
 });
