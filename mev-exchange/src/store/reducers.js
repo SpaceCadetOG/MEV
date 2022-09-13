@@ -67,18 +67,6 @@ export const exchange = (state = { loaded: false, contracts: [] }, action) => {
         contract: action.exchange,
       };
 
-    case "EXCHANGE_TOKEN_1_BALANCE_LOADED":
-      return {
-        ...state,
-        balances: [action.balance],
-      };
-
-    case "EXCHANGE_TOKEN_2_BALANCE_LOADED":
-      return {
-        ...state,
-        balances: [action.balance],
-      };
-
     default:
       return state;
   }

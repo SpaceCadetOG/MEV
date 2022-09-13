@@ -22,16 +22,27 @@ def Step_0():
 def Step_1(list):
     """
     1. Structure Triagnalar Pairs
-        Compute"""
+        Compute
+    """
     triangle_pair = arbFuncs.create_pairs(list)
-    return triangle_pair
+    with open("structured_trianglar_pairs.json", "w") as fp:
+        json.dump(triangle_pair, fp)
 
 
-"""MAIN"""
+## Get Surface Rates
+def Step_2():
+    # Get Pairs
+    with open("structured_trianglar_pairs.json") as json_file:
+        structured_pairs = json.load(json_file)
+    # Get Surface Prices
+        prices_json = arbFuncs.get_coin_tickers(url)
+    # Loop Through and et Structure price Info
+    for t_pair in structured_pairs:
+        prices_dict = arbFuncs.get_price_for_t_pair(t_pair, prices_json)
+        surface_arb = arbFuncs.calc_triangular_arb_surface_rate(t_pair, prices_dict)
+""" MAIN """
 if __name__ == "__main__":
-    list = Step_0()
-    load_triangle_pair = Step_1(list)
-    print(load_triangle_pair)
-
-
-# print(token_list)
+    # coin_list = Step_0()
+    # structured_pairs = Step_1(coin_list)
+    # while True:
+    Step_2()

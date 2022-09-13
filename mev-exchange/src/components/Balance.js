@@ -1,12 +1,6 @@
 import flashbots from "../assets/flashbots.svg";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
 
 const Balance = () => {
-  const dispatch = useDispatch();
-  const symbols = useSelector((state) => state.tokens.symbols);
-  useEffect(dispatch);
-
   return (
     <div className="component exchange__transfers">
       <div className="component__header flex-between">
@@ -25,7 +19,6 @@ const Balance = () => {
             <small>Token</small>
             <br />
             <img src={flashbots} className="logo" alt="Token Logo" />
-            {symbols && symbols[0]}
           </p>
         </div>
 

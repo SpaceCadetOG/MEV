@@ -46,25 +46,12 @@ export const loadTokens = async (provider, addresses, dispatch) => {
 
 export const loadExchange = async (provider, address, dispatch) => {
   let exchange;
-
-  exchange = new ethers.Contract(address[1], EXCHANGE_ABI, provider);
-
+  exchange = new ethers.Contract(address, EXCHANGE_ABI, provider);
   dispatch({ type: "EXCHANGE_LOADED", exchange });
 
   return exchange;
 };
 
 export const loadBalances = async (exchange, tokens, account, dispatch) => {
-  let balance = ethers.utils.formatUnits(await tokens[0].balanceOf(account), 18)
-  dispatch({ type: 'TOKEN_1_BALANCE_LOADED', balance })
-
-  balance = ethers.utils.formatUnits(await exchange.user_balance(tokens[0].address, account), 18)
-  dispatch({ type: 'EXCHANGE_TOKEN_1_BALANCE_LOADED', balance })
-
-  balance = ethers.utils.formatUnits(await tokens[1].balanceOf(account), 18)
-  dispatch({ type: 'TOKEN_2_BALANCE_LOADED', balance })
-
-  balance = ethers.utils.formatUnits(await exchange.user_balance(tokens[1].address, account), 18)
-  dispatch({ type: 'EXCHANGE_TOKEN_2_BALANCE_LOADED', balance })
 
 }

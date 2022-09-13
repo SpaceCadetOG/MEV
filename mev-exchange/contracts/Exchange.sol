@@ -85,7 +85,7 @@ contract Exchange {
     function user_balance(address _token, address user)
         public
         view
-        returns (uint)
+        returns (uint256)
     {
         return tokens[_token][user];
     }

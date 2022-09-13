@@ -34,21 +34,24 @@ _With ETH 2.0 moving to Proof of Stake, MEV will have some changes. On way of ex
   ##  *Can Chainlink Break All blockchains? Is It a Single Point of failure?*
     1. Why All protocols should create their own oracles based on liquidty on platform
     2. Use Chainlink as a Fallback
-    3. Bridge Hacks...most were using chainlink oracles.
-    4. Validators and Oracle (node operations) will one
+    3. Bridge Hacks
+    4. Validators and Oracles (node operations) will become one thing. 
 
 ## Oracle Manplation and Front-running
     - If chainlink doesnt update?
+        - That could break alot of chains
 
-## TWAP oracle
-    - Constant Product vs Constant Product
+## TWAP Oracle
+    - Constant Product vs Constant Sum
+        - Which is safer and Gives a more accurate price
 
 ## MEV on L2
     - Deep Dive into the Tech
         - When L1 is Congested?
             - Does L2 slow down too?
         - L2 Sequencers
-            - Where can we find value 
+            - Where can we find value.
+            - how to build a relationship
     - Who winning the race after 1 year
         - [based on tech, user transactions, tvl]
 
@@ -60,8 +63,11 @@ _With ETH 2.0 moving to Proof of Stake, MEV will have some changes. On way of ex
     - Who saves more money
     - Who has faster trades
 
-    *This is for serious defi trader...like olympics training*
+    *Free Agent Defi Trader...like olympics training*
 
+
+
+*Read This stuff*
 
 [triangular arbitrage analysis article](https://blog.coinbase.com/quantitative-crypto-insight-an-analysis-of-triangular-arbitrage-transactions-in-uniswap-v2-1b572284bfa8)
 
@@ -70,3 +76,5 @@ _With ETH 2.0 moving to Proof of Stake, MEV will have some changes. On way of ex
 [Yes I Believe the hype](https://www.youtube.com/watch?v=RPeI3dC0uPc)
 
 [Good Read](https://pure.tudelft.nl/ws/portalfiles/portal/104736534/3474374.3486916.pdf)
+
+[Olympic Arbtrager](mev-wintermute/Why?.md)
