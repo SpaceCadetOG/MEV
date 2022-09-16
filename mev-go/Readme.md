@@ -5,6 +5,7 @@
 3. Flashbots Research: an open, transparent, and collaborative research effort to tackle short and long term research questions relevant to MEV.
 
 https://hackr.io/blog/golang-cheat-sheet
+http://www.353.solutions/py2go/index.html
 
 to run app: *{ go run cmd/server/main.go }* 
 
