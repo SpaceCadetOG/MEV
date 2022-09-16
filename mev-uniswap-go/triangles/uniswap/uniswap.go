@@ -5,12 +5,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/machinebox/graphql"
 	"io/ioutil"
 	"net/http"
-	// "sort"
-	// "strings"
-
-	"github.com/machinebox/graphql"
 )
 
 type UniswapPools struct {
@@ -37,17 +34,36 @@ type UniswapPools struct {
 	} `json:"data"`
 }
 
+type PairInfo struct {
+	base             string
+	quote            string
+	pair             string
+	token_0_contract string
+	token_1_contract string
+	contract         string
+	token_0_decimals string
+	token_0_price    string
+	token_1_decimals string
+	token_2_price    string
+}
+
+type Pair struct {
+	A []PairInfo
+	B []PairInfo
+	C []PairInfo
+}
+
 // Uniswap Method 1 => Standard Go Http Request
-func Uniswap() UniswapPools {
+func Uniswap() *UniswapPools {
 	fmt.Println("Uniswap Graph Method 1 (Arbitrum)")
-	arbi := "https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-minimal"
+	arbi := "https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-minimal" // for uniswap arbitrum
 	// Mapping that Will be query
 	jsonData := map[string]string{
 		"query": `
 		{
 			pools (orderBy: totalValueLockedETH, 
 			  orderDirection: desc,
-			  first:20) 
+			  first:500) 
 			  {
 				  id
 				  totalValueLockedETH
@@ -92,7 +108,7 @@ func Uniswap() UniswapPools {
 	// 	}
 
 	// }
-	return pools
+	return &pools
 }
 
 // Uniswap Method 2 => Go Package => will put into interface
@@ -129,22 +145,11 @@ func UniswapGraphMethod2() interface{} {
 }
 
 // structure pairs groups
-func (pairs UniswapPools) StructurePairGroups() {
-	// triangular_pairs_list := []TrianglePairs{}
-	// remove_duplicates_list := []string{}
-	pairs_list := pairs.Data.Pools[:10]
-	type PairInfo struct {
-		base             string
-		quote            string
-		pair             string
-		token_0_contract string
-		token_1_contract string
-		contract         string
-		token_0_decimals string
-		token_0_price    string
-		token_1_decimals string
-		token_2_price    string
-	}
+func StructurePairGroups(pairs *UniswapPools) []PairInfo {
+	triangular_pairs_list := []PairInfo{}
+	// remove_duplicates_list := []PairInfo{}
+	pairs_list := pairs.Data.Pools[0:]
+
 	// Loop through each token to find potential matches
 	for _, pair_a := range pairs_list {
 		// get first pair (A)
@@ -161,7 +166,6 @@ func (pairs UniswapPools) StructurePairGroups() {
 		// Pair A box
 		pair_a_box := []string{a_base, a_quote}
 		a := PairInfo{a_base, a_quote, a_pair, a_token_0_contract, a_token_1_contract, a_contract, a_token_0_decimals, a_token_0_price, a_token_1_decimals, a_token_1_price}
-		fmt.Printf("Pair A: %v \n", a)
 
 		for _, pair_b := range pairs_list {
 			// get first pair (B)
@@ -178,7 +182,6 @@ func (pairs UniswapPools) StructurePairGroups() {
 
 			if pair_b != pair_a {
 				b := PairInfo{b_base, b_quote, b_pair, b_token_0_contract, b_token_1_contract, b_contract, b_token_0_decimals, b_token_0_price, b_token_1_decimals, b_token_1_price}
-				fmt.Printf("Pair B: %v \n", b)
 
 				if b_base == pair_a_box[0] || b_quote == pair_a_box[0] || b_base == pair_a_box[1] || b_quote == pair_a_box[1] {
 					for _, pair_c := range pairs_list {
@@ -193,6 +196,7 @@ func (pairs UniswapPools) StructurePairGroups() {
 						c_token_0_price := pair_c.Token0Price
 						c_token_1_decimals := pair_c.Token1.Decimals
 						c_token_1_price := pair_c.Token1Price
+						c := PairInfo{c_base, c_quote, c_pair, c_token_0_contract, c_token_1_contract, c_contract, c_token_0_decimals, c_token_0_price, c_token_1_decimals, c_token_1_price}
 
 						if pair_c != pair_a && pair_c != pair_b {
 							pair_box := []string{a_base, a_quote, b_base, b_quote, c_base, c_quote}
@@ -202,23 +206,21 @@ func (pairs UniswapPools) StructurePairGroups() {
 							for _, l := range pair_box {
 								if l == c_base {
 									count_c_base += 1
-
 								}
 							}
 							for _, l := range pair_box {
 								if l == c_quote {
 									count_c_quote += 1
-
 								}
 							}
 							if count_c_base == 2 && count_c_quote == 2 && c_base != c_quote {
-								c := PairInfo{c_base, c_quote, c_pair, c_token_0_contract, c_token_1_contract, c_contract, c_token_0_decimals, c_token_0_price, c_token_1_decimals, c_token_1_price}
-								fmt.Printf("Pair C: %v \n", c)
-								fmt.Println()
-								fmt.Printf("Triangle: [a => [%v][%v]] -> [b => [%v][%v]] -> [c => [%v][%v]] \n", pair_a.Token0.Name, pair_a.Token1.Name, pair_b.Token0.Name, pair_b.Token1.Name, pair_c.Token0.Name, pair_c.Token1.Name)
-								fmt.Println()
+								// remove_duplicates_list = append(remove_duplicates_list)
+								triangular_pairs_list = append(triangular_pairs_list, a, b, c)
+								// fmt.Printf("PAIR A = [%v] || PAIR B = [%v] || PAIR C = [%v] \n", a.pair, b.pair, c.pair)
+
 							}
 						}
+
 
 					}
 
@@ -227,6 +229,8 @@ func (pairs UniswapPools) StructurePairGroups() {
 			}
 
 		}
+
 	}
 
+	return triangular_pairs_list[0:3]
 }
