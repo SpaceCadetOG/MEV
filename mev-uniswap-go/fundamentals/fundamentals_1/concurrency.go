@@ -1,4 +1,4 @@
-package fundamentalsdata
+package fundamentals
 
 import (
 	"fmt"
@@ -120,6 +120,7 @@ type Result struct {
 	URL    string
 	Status int
 }
+
 func _lookup(wId int, jobs <-chan Site, results chan<- Result) {
 
 	for site := range jobs {

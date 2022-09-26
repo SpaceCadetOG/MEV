@@ -1,4 +1,4 @@
-package fundamentalsdata
+package fundamentals
 
 import "fmt"
 
@@ -32,7 +32,7 @@ func SWITCH() {
 
 func LOOPS() []float64 {
 	prices := []float64{24.33, 45.77, 77.88}
-	
+
 	for _, v := range prices {
 		// fmt.Println(i)
 		fmt.Println(v)

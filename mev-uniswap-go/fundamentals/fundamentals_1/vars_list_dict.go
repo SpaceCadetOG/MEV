@@ -1,4 +1,4 @@
-package fundamentalsdata
+package fundamentals
 
 import "fmt"
 
@@ -60,7 +60,6 @@ func Structs() (Uniswap, Uniswap) {
 }
 
 // dictionary
-func Methods(u *Uniswap) (string, string){
+func Methods(u *Uniswap) (string, string) {
 	return u.token0, u.token1
 }
-

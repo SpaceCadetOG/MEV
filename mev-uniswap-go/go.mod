@@ -1,11 +1,10 @@
-module github.com/SpaceCadetOG/MEV/mev-go
+module github.com/SpaceCadetOG/MEV/mev-uniswap-go
 
 go 1.19
 
 require (
-	github.com/ethereum/go-ethereum v1.10.23
+	github.com/ethereum/go-ethereum v1.10.25
 	github.com/graphql-go/graphql v0.8.0
-	github.com/holiman/uint256 v1.2.0
 	github.com/machinebox/graphql v0.2.2
 )
 
