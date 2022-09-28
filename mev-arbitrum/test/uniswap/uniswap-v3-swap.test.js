@@ -11,9 +11,9 @@ const WETH = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1";
 const DECIMALS_1 = 18n;
 
 // GMX
-const TOKEN_2 = "0xfc5A1A6EB076a2C7aD06eD22C90d7E710E35ad0a";
+const GMX = "0xfc5A1A6EB076a2C7aD06eD22C90d7E710E35ad0a";
 
-const TOKEN_3 = "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f";
+const WBTC = "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f";
 const DECIMALS_3 = 8n;
 
 // 0.3%
@@ -36,7 +36,6 @@ describe("UniswapV3 SWAP", () => {
       "function transferFrom(address from, address to, uint256 amount) external returns (bool)",
     ];
 
-
     const WETHAbi = [
       "function deposit() external payable",
       "function withdraw(uint) external",
@@ -50,7 +49,6 @@ describe("UniswapV3 SWAP", () => {
     const twap = await UniswapV3Twap.deploy();
     await twap.deployed();
 
-
     const TestChainlink = await ethers.getContractFactory("ArbitrumPrices");
     let testChainlink = await TestChainlink.deploy();
     await testChainlink.deployed();
@@ -61,7 +59,7 @@ describe("UniswapV3 SWAP", () => {
 
     fundAmount = 20000n * 10n ** 18n; // 20000 dai
     ethAmount = 4n * 10n ** 18n; // 1 eth
-    
+
     await weth.connect(owner).deposit({ value: ethAmount });
     await weth.connect(owner).approve(twap.address, ethAmount);
 
@@ -80,31 +78,33 @@ describe("UniswapV3 SWAP", () => {
       usdc,
       ethAmount,
       twap,
-      testChainlink , weth
+      testChainlink,
+      weth,
     };
   }
-  it.only(" WETH => DAI on Uniswap  => 0.03%", async () => {
-    const { twap, owner, ethAmount, dai , testChainlink, weth } = await loadFixture(deployFixture);
+  it.only(" WETH => USDC on Uniswap  => 0.03%", async () => {
+    const { twap, owner, ethAmount, dai, usdc, testChainlink } =
+      await loadFixture(deployFixture);
 
-    amount = 10n ** 18n
-    price = await testChainlink.getLatestPriceETH()
-    await twap.swapExactInputSingle(weth.address, amount, dai.address);
+    amount = 10n ** 18n;
+    price = await testChainlink.getLatestPriceETH();
+    await twap.SingleSwap(WETH, amount, usdc.address, 3000);
 
-    console.log(ethers.utils.formatEther(await dai.balanceOf(owner.address)))
-    console.log(price)
-
+    console.log(
+      ethers.utils.formatUnits(await usdc.balanceOf(owner.address), 6)
+    );
+    console.log(price);
   });
 
   it.only(" WETH => DAI on Uniswap  => 0.03%", async () => {
-    const { twap, owner, ethAmount, dai , testChainlink, weth } = await loadFixture(deployFixture);
-    
-    amount = 10n ** 18n
-    daiAmount = 1549n * 10n ** 18n; // 1 eth
-    price = await testChainlink.getLatestPriceETH()
-    await twap.swapExactOutputSingle(weth.address, dai.address, daiAmount, amount)
-    console.log(ethers.utils.formatEther(await dai.balanceOf(owner.address)))
-    console.log(price)
+    const { twap, owner, ethAmount, dai, usdc, testChainlink } =
+      await loadFixture(deployFixture);
 
+    amount = 10n ** 18n;
+    price = await testChainlink.getLatestPriceETH();
+    await twap.SingleSwap(WETH, amount, dai.address, 3000);
+
+    console.log(ethers.utils.formatEther(await dai.balanceOf(owner.address)));
+    console.log(price);
   });
 });
-

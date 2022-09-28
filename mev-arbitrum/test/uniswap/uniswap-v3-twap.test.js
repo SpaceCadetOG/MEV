@@ -1,6 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
+
 const FACTORY = "0x1F98431c8aD98523631AE4a59f267346ea31F984";
 // USDC
 const TOKEN_0 = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8";
@@ -35,6 +36,7 @@ describe("UniswapV3TWAP Oracle", () => {
     const UniswapV3Twap = await ethers.getContractFactory("UniwapV3TWAP");
     const twap = await UniswapV3Twap.deploy(FACTORY, TOKEN_0, TOKEN_1, 10000);
     await twap.deployed();
+  
 
     const price = await twap.estimateAmountOut(TOKEN_1, 10n ** DECIMALS_1, 10);
     console.table({
